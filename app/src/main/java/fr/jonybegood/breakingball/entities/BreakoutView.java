@@ -18,6 +18,8 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import fr.jonybegood.breakingball.database.DbHelper;
 import fr.jonybegood.breakingball.entities.Ball;
 import fr.jonybegood.breakingball.entities.Paddle;
 import fr.jonybegood.breakingball.entities.Brick;
@@ -29,7 +31,7 @@ public class BreakoutView extends View {
     private Ball ball;
     private Paddle paddle;
     private List<Brick> bricks;
-    private Paint paint;
+    private Paint paint, paintText;
 
     private boolean start_flag=false;
 
@@ -57,13 +59,15 @@ public class BreakoutView extends View {
 
     private static Context context;
 
+    private DbHelper db;
+
     private boolean runningThread;
 
     private Thread checCollisionThread;
 
     private MediaPlayer mediaPlayerBrick, mediaPlayerWin, mediaPlayerLose, mediaPlayerGameOver;
 
-    private boolean flagWin,flagLoose;
+    private boolean flagWin,flagLoose,flagEndGame;
     private Game current_game;
 
     private TextView tvGameInfo, tvScore,tvHighscore;
@@ -72,14 +76,17 @@ public class BreakoutView extends View {
 
     private int ballRebound;
 
+    private int blinkingText;
+
     public BreakoutView(Context context,Game game, TextView tvGameInfo, TextView tvScore, TextView tvHighscore, boolean runningThread) {
         super(context);
-        current_game = game;
         this.context=context;
         this.tvGameInfo = tvGameInfo;
         this.tvScore =tvScore;
         this.tvHighscore=tvHighscore;
         this.runningThread=runningThread;
+        current_game = game;
+        db = new DbHelper(context);
         ballSpeed = BALL_SPEED;
         flagLoose = false;
         flagWin = false;
@@ -101,6 +108,7 @@ public class BreakoutView extends View {
         int startX = (ScreenTools.getScreenWidth(context)-(nbCol*(brickWidth+1)))/2;
         scoreMultiplier=1;
         ballRebound=0;
+        blinkingText=0;
         runningThread=true;
 
         Random random = new Random();
@@ -142,6 +150,7 @@ public class BreakoutView extends View {
         mediaPlayerLose= MediaPlayer.create(this.getContext(), R.raw.lose);
         mediaPlayerGameOver= MediaPlayer.create(this.getContext(), R.raw.game_over);
         paint = new Paint();
+        paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -172,6 +181,10 @@ public class BreakoutView extends View {
             // Dessiner la limite basse
             paint.setColor(Color.LTGRAY);
             canvas.drawRect(0, bottomLimit - 1, ScreenTools.getScreenWidth(context), bottomLimit + 1, paint);
+
+            // Dessiner la limite haute
+            paint.setColor(Color.LTGRAY);
+            canvas.drawRect(0, 0, ScreenTools.getScreenWidth(context), 2, paint);
 
             // Dessiner la balle
             paint.setColor(Color.WHITE);
@@ -316,6 +329,7 @@ public class BreakoutView extends View {
             }
             if (end_flag) {
                 flagWin = true;
+                flagEndGame = true;
             }
 
             if (flagWin) {
@@ -330,6 +344,7 @@ public class BreakoutView extends View {
                     if (current_game.getLife() == 0) {
                         mediaPlayerGameOver.start();
                         flagLoose = true;
+                        flagEndGame = true;
                     } else
                         mediaPlayerLose.start();
                 }
@@ -351,46 +366,82 @@ public class BreakoutView extends View {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
             }
+
             canvas.drawColor(Color.BLACK);
-            paint.setColor(Color.BLUE);
             paint.setStrokeWidth(10);
             paint.setStyle(Paint.Style.STROKE); // Style pour le contour de la flèche
-
             Path path = new Path();
             createArrowPath(path);
+            blinkingText++;
+            if(blinkingText<50) {
+                if(flagLoose){
+                    paint.setColor(Color.RED);
+                    paintText.setColor(Color.RED);
+                }
+                if(flagWin){
+                    paint.setColor(Color.GREEN);
+                    paintText.setColor(Color.GREEN);
+                }
+            }
+            else{
+                paint.setColor(Color.BLUE);
+                paintText.setColor(Color.BLUE);
+            }
+
+            if(blinkingText>100)
+                blinkingText=0;
+
             canvas.drawPath(path, paint);
-            paint.setColor(Color.RED);
-            canvas.drawPath(path, paint);
+
+            paintText.setTextSize(48);
+            if(flagWin)
+                canvas.drawText("Swipe up to change level", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 50, paintText);
+            if(flagLoose)
+                canvas.drawText("Swipe up to restart level", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 50, paintText);
+
+            paintText.setTextSize(100);
+            if(flagWin)
+                canvas.drawText("You Win", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
+            if(flagLoose)
+                canvas.drawText("Game Over", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
         }
 
         invalidate();
 
-        if(flagWin){
-            runningThread=false;
-            nextLevel();
-        }
-        else if(flagLoose){
-            restartGame();
-            runningThread=false;
+        if(flagEndGame)
+        {
+            if(flagWin){
+                runningThread=false;
+                nextLevel();
+            }
+            else if(flagLoose){
+                restartGame();
+                runningThread=false;
+            }
         }
 
     }
 
     private void nextLevel() {
-
+        current_game.getP().setLevel(current_game.getP().getLevel()+1);
+        flagEndGame = false;
     }
 
     private void restartGame() {
-
+        db.modifyProfil(current_game.getP());
+        flagEndGame = false;
     }
 
     private void createArrowPath(Path path) {
         // Définir les points de la flèche
-        path.moveTo(50, 100); // Point de départ (en bas au centre)
-        path.lineTo(100, 50); // Ligne vers le haut droite
-        path.lineTo(150, 100); // Ligne vers le bas droite
-        path.moveTo(100, 50); // Retour au point central en haut
-        path.lineTo(100, 150); // Ligne vers le bas centre
+        float middleX = ScreenTools.getScreenWidth(context)/2;
+        float middleY = ScreenTools.getScreenHeight(context)/2;
+
+        path.moveTo(middleX, middleY);
+        path.lineTo(middleX, middleY-250);
+        path.lineTo(middleX-100, middleY-150);
+        path.moveTo(middleX, middleY-250);
+        path.lineTo(middleX+100, middleY-150);
     }
 
     @Override
@@ -433,6 +484,11 @@ public class BreakoutView extends View {
 
                 if(paddleY<NB_ROW*(BRICK_HEIGHT+1)+BRICK_START_Y)
                     paddleY=NB_ROW*(BRICK_HEIGHT+1)+BRICK_START_Y;
+
+                if(paddleX>ScreenTools.getScreenWidth(context)-paddle.getWidth())
+                    paddleX=ScreenTools.getScreenWidth(context)-paddle.getWidth();
+                if(paddleX<0)
+                    paddleX=0;
 
                 paddle.setX(paddleX);
                 paddle.setY(paddleY);

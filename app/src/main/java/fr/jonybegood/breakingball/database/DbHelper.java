@@ -100,6 +100,17 @@ public class DbHelper extends SQLiteOpenHelper {
         return profil;
     }
 
+    public void modifyProfil(Profil p){
+        Profil profil=null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PASSWORD,p.getPassword());
+        values.put(COLUMN_HIGHSCORE,p.getHighScore());
+        values.put(COLUMN_LEVEL,p.getLevel());
+        values.put(COLUMN_PHOTO,p.getPhoto());
+        db.update(TABLE_NAME,values,COLUMN_PSEUDO+"=?",new String[]{String.valueOf(p.getPseudo())});
+    }
+
     public boolean removeByPseudo(String pseudo){
         int res;
         SQLiteDatabase db = this.getReadableDatabase();
