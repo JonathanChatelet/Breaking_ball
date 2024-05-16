@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/snowfall"
+    tools:context=".NewProfilActivity">
+
+    <Button
+        android:id="@+id/btn_clr_pseudo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="#66FBFAFA"
+        android:backgroundTint="#FFFDFD"
+        android:backgroundTintMode="src_in"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:onClick="btnClearPseudo"
+        android:paddingStart="0dp"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="0dp"
+        android:text="X"
+        android:textAlignment="center"
+        android:textColor="#040404"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_clr_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.865"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.71" />
+
+    <TextView
+        android:id="@+id/tv_new_Pseudo"
+        android:layout_width="403dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="Enter your pseudo :"
+        android:textColor="#0B0B0B"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.164" />
+
+    <TextView
+        android:id="@+id/tv_new_pw1"
+        android:layout_width="420dp"
+        android:layout_height="51dp"
+        android:gravity="center"
+        android:text="Enter your password (only alphanumeric)\nAt least 8 catracters :"
+        android:textColor="#040303"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        app:layout_constraintVertical_bias="0.181" />
+
+    <TextView
+        android:id="@+id/tv_new_pw2"
+        android:layout_width="412dp"
+        android:layout_height="30dp"
+        android:text="Verify your password :"
+        android:gravity="center"
+        android:textColor="#070707"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.437" />
+
+    <EditText
+        android:id="@+id/et_pseudo"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:background="#66FBFAFA"
+        android:ems="10"
+        android:inputType="text"
+        android:textColor="#020202"
+        app:layout_constraintBottom_toTopOf="@+id/tv_new_pw1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.312"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.947" />
+
+    <Button
+        android:id="@+id/btn_clr_password"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="#66FBFAFA"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:onClick="btnClearPassword"
+        android:paddingStart="0dp"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="0dp"
+        android:text="X"
+        android:textAlignment="center"
+        android:textColor="#040404"
+        android:textSize="20dp"
+        app:iconPadding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.865"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.353"
+        app:rippleColor="#FBFAFA" />
+
+    <EditText
+        android:id="@+id/et_password1"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="4dp"
+        android:background="#66FBFAFA"
+        android:ems="10"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/tv_new_pw2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.312"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_new_pw1"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <EditText
+        android:id="@+id/et_password2"
+        android:layout_width="280dp"
+        android:layout_height="40dp"
+        android:background="#66FDFDFD"
+        android:ems="10"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.312"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        app:layout_constraintVertical_bias="0.415" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:shadowColor="#434242"
+        android:shadowDx="20"
+        android:shadowDy="20"
+        android:shadowRadius="10"
+        android:text="NEW PROFIL"
+        android:textColor="#050505"
+        android:textSize="34sp"
+        android:textStyle="bold"
+
+        app:layout_constraintBottom_toTopOf="@+id/tv_new_Pseudo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.571" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="btnSaveProfil"
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button7"
+        app:layout_constraintHorizontal_bias="0.614"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.62" />
+
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="btnCancelProfil"
+        android:text="Cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.699"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.62" />
+
+    <Button
+        android:id="@+id/btn_clr_password2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="#66FBFAFA"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:onClick="btnClearPassword2"
+        android:paddingStart="0dp"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="0dp"
+        android:text="X"
+        android:textAlignment="center"
+        android:textColor="#040404"
+        android:textSize="20dp"
+        app:iconPadding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.865"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_clr_password"
+        app:layout_constraintVertical_bias="0.13" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

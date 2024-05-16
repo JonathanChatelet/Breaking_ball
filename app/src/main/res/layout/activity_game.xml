@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".GameActivity">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="false">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@color/black">
+
+        <TextView
+            android:id="@+id/tv_game_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="90"
+            android:textAlignment="center"
+            android:textColor="#FBFAFA"
+            android:textSize="20sp"
+            android:visibility="visible" />
+
+        <Button
+
+            android:id="@+id/btn_clr_profil"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="#66FBFAFA"
+            android:backgroundTint="#FFFDFD"
+            android:backgroundTintMode="src_in"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:onClick="btnQuitGame"
+            android:paddingStart="0dp"
+            android:paddingLeft="0dp"
+            android:paddingTop="0dp"
+            android:paddingEnd="0dp"
+            android:paddingRight="0dp"
+            android:paddingBottom="0dp"
+            android:text="X"
+            android:textAlignment="center"
+            android:textColor="#FDFCFC"
+            android:textSize="12sp"
+            app:rippleColor="#F8F5F5" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fragmentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@color/black"
+        android:textAlignment="center"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black">
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Current score :"
+            android:textColor="#FDFAFA" />
+        <TextView
+            android:id="@+id/tv_current_pseudo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Highscore"
+            android:textColor="#FAF8F8" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black">
+
+        <TextView
+            android:id="@+id/tv_current_score"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="0"
+            android:textColor="#F8F5F5" />
+
+
+        <TextView
+            android:id="@+id/tv_highscore"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="50"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="0"
+            android:textColor="#F6F3F3" />
+    </LinearLayout>
+
+</LinearLayout>
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
