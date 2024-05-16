@@ -1,3 +1,4 @@
+/*
 package fr.jonybegood.breakingball.tools;
 
 import android.view.GestureDetector;
@@ -26,3 +27,4 @@ public class GestureTools extends GestureDetector.SimpleOnGestureListener {
     }
 }
 
+*/
