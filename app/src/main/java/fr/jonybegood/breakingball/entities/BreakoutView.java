@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.media.MediaPlayer;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import fr.jonybegood.breakingball.entities.Brick;
 
 import fr.jonybegood.breakball.tools.ScreenTools;
 import fr.jonybegood.breakingball.R;
+import fr.jonybegood.breakingball.tools.GestureTools;
 
 public class BreakoutView extends View {
     private Ball ball;
@@ -78,6 +80,8 @@ public class BreakoutView extends View {
 
     private int blinkingText;
 
+    private GestureDetector gestureDetector;
+
     public BreakoutView(Context context,Game game, TextView tvGameInfo, TextView tvScore, TextView tvHighscore, boolean runningThread) {
         super(context);
         this.context=context;
@@ -91,6 +95,17 @@ public class BreakoutView extends View {
         flagLoose = false;
         flagWin = false;
         bottomLimit = ScreenTools.getScreenHeight(context) - BOTTOM_LIMIT;
+
+        GestureTools gestureTools = new GestureTools(){
+            @Override
+            public void onSwipeUp(){
+                flagLoose=false;
+                flagWin=false;
+            }
+
+        };
+
+        gestureDetector = new GestureDetector(context, gestureTools);
 
         // Initialisation de la raquette
         paddle = new Paddle((ScreenTools.getScreenWidth(context)-PADDLE_WIDTH)/2, bottomLimit-100, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -175,6 +190,8 @@ public class BreakoutView extends View {
                 if (ballSpeed > 0) ballSpeed += 2;
                 else ballSpeed -= 2;
             }
+            canvas.drawColor(Color.BLACK);
+
             paint.setColor(Color.BLACK);
             canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
 
@@ -366,7 +383,6 @@ public class BreakoutView extends View {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
             }
-
             canvas.drawColor(Color.BLACK);
             paint.setStrokeWidth(10);
             paint.setStyle(Paint.Style.STROKE); // Style pour le contour de la flèche
@@ -424,11 +440,14 @@ public class BreakoutView extends View {
 
     private void nextLevel() {
         current_game.getP().setLevel(current_game.getP().getLevel()+1);
+        db.modifyProfil(current_game.getP());
         flagEndGame = false;
     }
 
     private void restartGame() {
         db.modifyProfil(current_game.getP());
+        current_game.setScore(0);
+        current_game.setLife(5);
         flagEndGame = false;
     }
 

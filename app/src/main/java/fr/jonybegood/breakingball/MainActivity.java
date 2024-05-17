@@ -132,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
                         Bundle b = new Bundle();
                         b = data.getExtras();
                         game = (Game) b.getSerializable("game");
+                        tvPlayerInfo.setText(game.getP().getPseudo() + " / level : " + game.getP().getLevel() + " / highscore : " + game.getP().getHighScore());
+
                     }
                 }
         );
