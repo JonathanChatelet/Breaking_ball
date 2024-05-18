@@ -27,6 +27,7 @@ import fr.jonybegood.breakingball.entities.Brick;
 
 import fr.jonybegood.breakball.tools.ScreenTools;
 import fr.jonybegood.breakingball.R;
+import fr.jonybegood.breakingball.tools.BooleanWrapper;
 import fr.jonybegood.breakingball.tools.GestureTools;
 
 public class BreakoutView extends View {
@@ -38,7 +39,7 @@ public class BreakoutView extends View {
     private boolean start_flag=false;
 
     private static final int BALL_RADIUS = 10;
-    private static final int BALL_SPEED = -5;
+    private static final int BALL_SPEED = -6;
     private static final int PADDLE_SPEED = 20;
     private static final int PADDLE_HEIGHT = 20;
     private static final int PADDLE_WIDTH = 100;
@@ -63,7 +64,7 @@ public class BreakoutView extends View {
 
     private DbHelper db;
 
-    private boolean runningThread;
+    private BooleanWrapper runningThread;
 
     private Thread checCollisionThread;
 
@@ -82,7 +83,7 @@ public class BreakoutView extends View {
 
     private GestureDetector gestureDetector;
 
-    public BreakoutView(Context context,Game game, TextView tvGameInfo, TextView tvScore, TextView tvHighscore, boolean runningThread) {
+    public BreakoutView(Context context,Game game, TextView tvGameInfo, TextView tvScore, TextView tvHighscore, BooleanWrapper runningThread) {
         super(context);
         this.context=context;
         this.tvGameInfo = tvGameInfo;
@@ -91,53 +92,31 @@ public class BreakoutView extends View {
         this.runningThread=runningThread;
         current_game = game;
         db = new DbHelper(context);
-        ballSpeed = BALL_SPEED;
-        flagLoose = false;
-        flagWin = false;
-        bottomLimit = ScreenTools.getScreenHeight(context) - BOTTOM_LIMIT;
 
         GestureTools gestureTools = new GestureTools(){
             @Override
             public void onSwipeUp(){
-                flagLoose=false;
-                flagWin=false;
+                if(flagWin||flagLoose)
+                    initialiseScreenGame();
             }
 
         };
 
         gestureDetector = new GestureDetector(context, gestureTools);
 
-        // Initialisation de la raquette
-        paddle = new Paddle((ScreenTools.getScreenWidth(context)-PADDLE_WIDTH)/2, bottomLimit-100, PADDLE_WIDTH, PADDLE_HEIGHT);
-
-        // Initialisation de la balle
-        ball = new Ball(paddle.getX()+(PADDLE_WIDTH/2), paddle.getY()-BALL_RADIUS-1, -ballSpeed, ballSpeed, BALL_RADIUS);
-
-        // Initialisation des briques
-        bricks = new ArrayList<>();
-        int brickWidth = BRICK_WIDTH;
-        int brickHeight = BRICK_HEIGHT;
-        int startY = BRICK_START_Y;
-        int nbRow = NB_ROW;
-        int nbCol = (ScreenTools.getScreenWidth(context)-BRICK_START_X*2)/(brickWidth+1);
-        int startX = (ScreenTools.getScreenWidth(context)-(nbCol*(brickWidth+1)))/2;
-        scoreMultiplier=1;
-        ballRebound=0;
-        blinkingText=0;
-        runningThread=true;
-
-        Random random = new Random();
-        // Créer plusieurs lignes de briques
-        for (int row = 0; row < nbRow; row++) {
-            for (int col = 0; col < nbCol; col++) {
-                bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR-1)]));
+        this.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
             }
-        }
-        boolean finalRunningThread = runningThread;
+        });
+
+        initialiseScreenGame();
+        BooleanWrapper finalRunningThread = runningThread;
         checCollisionThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(finalRunningThread){
+                while(finalRunningThread.value){
                     // Gestion des collisions avec la raquette
                     if ((ball.getY()+BALL_RADIUS) > paddle.getY() && (ball.getY()+BALL_RADIUS) < paddle.getY() + paddle.getHeight() &&
                             ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()) {
@@ -160,12 +139,12 @@ public class BreakoutView extends View {
             }
         });
         checCollisionThread.start();
+
+
         mediaPlayerBrick = MediaPlayer.create(this.getContext(), R.raw.glass_hit);
         mediaPlayerWin = MediaPlayer.create(this.getContext(), R.raw.success);
         mediaPlayerLose= MediaPlayer.create(this.getContext(), R.raw.lose);
         mediaPlayerGameOver= MediaPlayer.create(this.getContext(), R.raw.game_over);
-        paint = new Paint();
-        paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -251,9 +230,11 @@ public class BreakoutView extends View {
                         case "UR":
                             if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
                                     ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                if(ball.getX()-brick.getX()>brick.getY()+brick.getHeight()-ball.getY())
                                     ball.setDy(-ball.getDy());
-                                if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                else
                                     ball.setDx(-ball.getDx());
                                 brick.setIsBroken(true);
                                 if (current_game.getSound_effect()) {
@@ -274,9 +255,11 @@ public class BreakoutView extends View {
                         case "UL":
                             if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
                                     ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                if(brick.getX()+brick.getWidth()-ball.getX()>brick.getY()+brick.getHeight()-ball.getY())
                                     ball.setDy(-ball.getDy());
-                                if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                else
                                     ball.setDx(-ball.getDx());
                                 brick.setIsBroken(true);
                                 if (current_game.getSound_effect()) {
@@ -297,9 +280,11 @@ public class BreakoutView extends View {
                         case "DR":
                             if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
                                     ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                if(ball.getX()-brick.getX()> ball.getY()-brick.getY())
                                     ball.setDy(-ball.getDy());
-                                if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                else
                                     ball.setDx(-ball.getDx());
                                 brick.setIsBroken(true);
                                 if (current_game.getSound_effect()) {
@@ -320,9 +305,11 @@ public class BreakoutView extends View {
                         case "DL":
                             if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
                                     ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                if(brick.getX()+brick.getWidth()-ball.getX()>ball.getY()-brick.getY())
                                     ball.setDy(-ball.getDy());
-                                if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                else
                                     ball.setDx(-ball.getDx());
                                 brick.setIsBroken(true);
                                 if (current_game.getSound_effect()) {
@@ -427,12 +414,12 @@ public class BreakoutView extends View {
         if(flagEndGame)
         {
             if(flagWin){
-                runningThread=false;
+                runningThread.value=false;
                 nextLevel();
             }
             else if(flagLoose){
                 restartGame();
-                runningThread=false;
+                runningThread.value=false;
             }
         }
 
@@ -461,6 +448,43 @@ public class BreakoutView extends View {
         path.lineTo(middleX-100, middleY-150);
         path.moveTo(middleX, middleY-250);
         path.lineTo(middleX+100, middleY-150);
+    }
+
+    private void initialiseScreenGame(){
+        runningThread = new BooleanWrapper(true);
+        ballSpeed = BALL_SPEED;
+        flagLoose = false;
+        flagWin = false;
+        bottomLimit = ScreenTools.getScreenHeight(context) - BOTTOM_LIMIT;
+
+        // Initialisation de la raquette
+        paddle = new Paddle((ScreenTools.getScreenWidth(context)-PADDLE_WIDTH)/2, bottomLimit-100, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+        // Initialisation de la balle
+        ball = new Ball(paddle.getX()+(PADDLE_WIDTH/2), paddle.getY()-BALL_RADIUS-1, -ballSpeed, ballSpeed, BALL_RADIUS);
+
+        // Initialisation des briques
+        bricks = new ArrayList<>();
+        int brickWidth = BRICK_WIDTH;
+        int brickHeight = BRICK_HEIGHT;
+        int startY = BRICK_START_Y;
+        int nbRow = NB_ROW;
+        int nbCol = (ScreenTools.getScreenWidth(context)-BRICK_START_X*2)/(brickWidth+1);
+        int startX = (ScreenTools.getScreenWidth(context)-(nbCol*(brickWidth+1)))/2;
+        scoreMultiplier=1;
+        ballRebound=0;
+        blinkingText=0;
+
+
+        Random random = new Random();
+        // Créer plusieurs lignes de briques
+        for (int row = 0; row < nbRow; row++) {
+            for (int col = 0; col < nbCol; col++) {
+                bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR-1)]));
+            }
+        }
+        paint = new Paint();
+        paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override

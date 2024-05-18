@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import fr.jonybegood.breakingball.entities.BreakoutView;
 import fr.jonybegood.breakingball.entities.Game;
+import fr.jonybegood.breakingball.tools.BooleanWrapper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,19 +33,19 @@ public class GameFragment extends Fragment {
 
     private TextView tvGameInfo,tvScore,tvHighscore;
 
-    private boolean runningThread;
+    private BooleanWrapper runningThread=new BooleanWrapper(true);
 
     public GameFragment() {
         // Required empty public constructor
     }
 
-    public GameFragment(Game game, TextView tvGameInfo, TextView tvScore,TextView tvHighscore, boolean runningThread) {
+    public GameFragment(Game game, TextView tvGameInfo, TextView tvScore,TextView tvHighscore, BooleanWrapper runningThread) {
         // Required empty public constructor
         this.game=game;
         this.tvGameInfo = tvGameInfo;
         this.tvScore = tvScore;
         this.tvHighscore=tvHighscore;
-        this.runningThread=runningThread;
+        this.runningThread.value=runningThread.value;
     }
 
     /**
