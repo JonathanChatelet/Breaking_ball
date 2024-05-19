@@ -14,7 +14,7 @@ public class GestureTools extends GestureDetector.SimpleOnGestureListener {
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         // Détecter un geste de haut en bas
-        if (e2.getY() < e1.getY()) {
+        if (e1.getY()-e2.getY()>300) {
             // Geste de bas en haut détecté
             onSwipeUp();
             return true;

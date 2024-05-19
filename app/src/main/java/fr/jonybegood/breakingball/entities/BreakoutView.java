@@ -157,8 +157,8 @@ public class BreakoutView extends View {
 
             if (!tvScore.getText().equals(String.valueOf(current_game.getScore())))
                 tvScore.setText(String.valueOf(current_game.getScore()));
-            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Vie : " + String.valueOf(current_game.getLife())))
-                tvGameInfo.setText("Level " + String.valueOf(current_game.getP().getLevel()) + " - Vie : " + String.valueOf(current_game.getLife()));
+            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife())))
+                tvGameInfo.setText("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife()));
             if (current_game.getScore() > current_game.getP().getHighScore()) {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
@@ -345,13 +345,16 @@ public class BreakoutView extends View {
             if (ball.getY() > bottomLimit) {
                 current_game.setLife(current_game.getLife() - 1);
                 if (current_game.getSound_effect()) {
-                    if (current_game.getLife() == 0) {
+                    if (current_game.getLife() == 0)
                         mediaPlayerGameOver.start();
-                        flagLoose = true;
-                        flagEndGame = true;
-                    } else
+                    else
                         mediaPlayerLose.start();
                 }
+                if (current_game.getLife() == 0){
+                    flagLoose = true;
+                    flagEndGame = true;
+                }
+
                 scoreMultiplier = 1;
                 ballRebound = 0;
                 ballSpeed = BALL_SPEED;
@@ -364,8 +367,8 @@ public class BreakoutView extends View {
         else{
             if (!tvScore.getText().equals(String.valueOf(current_game.getScore())))
                 tvScore.setText(String.valueOf(current_game.getScore()));
-            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Vie : " + String.valueOf(current_game.getLife())))
-                tvGameInfo.setText("Level " + String.valueOf(current_game.getP().getLevel()) + " - Vie : " + String.valueOf(current_game.getLife()));
+            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife())))
+                tvGameInfo.setText("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife()));
             if (current_game.getScore() > current_game.getP().getHighScore()) {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
