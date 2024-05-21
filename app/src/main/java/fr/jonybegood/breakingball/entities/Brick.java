@@ -32,9 +32,6 @@ public class Brick {
     public void setColor(int color) {
         this.color = color;
     }
-    public void setIsBroken(boolean isBroken) {
-        this.isBroken = isBroken;
-    }
 
     public float getX() {
         return x;
@@ -58,6 +55,18 @@ public class Brick {
 
     public int getColor() {
         return color;
+    }
+
+    public void setIsBroken(boolean isBroken) {
+
+        if(this.getColor()!=Color.WHITE) {
+            if(this.getColor()==Color.LTGRAY)
+                this.setColor(Color.GRAY);
+            else if(this.getColor()==Color.GRAY)
+                this.setColor(Color.DKGRAY);
+            else
+                this.isBroken = isBroken;
+        }
     }
 
     public Brick(float x, float y, float width, float height, int color) {

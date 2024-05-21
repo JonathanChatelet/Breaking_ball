@@ -57,6 +57,8 @@ public class BreakoutView extends View {
 
     private int ballSpeed;
 
+    private Levels levels;
+
     private static final int COLOR[] = {Color.GREEN,Color.RED,Color.BLUE,Color.CYAN,Color.MAGENTA,Color.YELLOW};
     private static final int NB_COLOR = 6;
 
@@ -91,6 +93,7 @@ public class BreakoutView extends View {
         this.tvHighscore=tvHighscore;
         this.runningThread=runningThread;
         current_game = game;
+        levels = new Levels();
         db = new DbHelper(context);
 
         GestureTools gestureTools = new GestureTools(){
@@ -122,13 +125,27 @@ public class BreakoutView extends View {
                             ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()) {
                         if(start_flag==false) start_flag=true;
                         else {
-                            ball.setDy(ballSpeed);
+                            if((ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/4)||(ball.getX() > paddle.getX()+ paddle.getWidth()*3/4 && ball.getX() < paddle.getX() + paddle.getWidth()))
+                                ball.setDy(ballSpeed/2);
+                            else
+                                ball.setDy(ballSpeed);
+                            //ball.setDy(ballSpeed);
                             ballRebound++;
                         }
-                        if(ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/2)
+                        if(ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/4)
+                            ball.setDx(ballSpeed*2);
+                        else if(ball.getX() > paddle.getX()+ paddle.getWidth()*3/4 && ball.getX() < paddle.getX() + paddle.getWidth())
+                            ball.setDx(-ballSpeed*2);
+                        else if((ball.getX()> paddle.getX() + paddle.getWidth()/4)&&(ball.getX()< paddle.getX() + paddle.getWidth()/2))
                             ball.setDx(ballSpeed);
                         else
                             ball.setDx(-ballSpeed);
+
+                        /*if(ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/2)
+                            ball.setDx(ballSpeed);
+                        else
+                            ball.setDx(-ballSpeed);*/
+
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
@@ -166,8 +183,27 @@ public class BreakoutView extends View {
 
             if (ballRebound > 20) {
                 ballRebound = 0;
+                if (ball.getDy()<0){
+                    if(ball.getDy()>ballSpeed)  ball.setDy(ball.getDy()-1);
+                    else ball.setDy(ball.getDy()-2);
+                }
+                else{
+                    if(ball.getDy()<ballSpeed)  ball.setDy(ball.getDy()+1);
+                    else ball.setDy(ball.getDy()+2);
+                }
+
+                if (ball.getDx()<0){
+                    if(ball.getDx()<ballSpeed)  ball.setDx(ball.getDx()-4);
+                    else ball.setDx(ball.getDx()-2);
+                }
+                else{
+                    if(ball.getDx()>ballSpeed)  ball.setDx(ball.getDx()-4);
+                    else ball.setDx(ball.getDx()-2);
+                }
+
                 if (ballSpeed > 0) ballSpeed += 2;
                 else ballSpeed -= 2;
+
             }
             canvas.drawColor(Color.BLACK);
 
@@ -225,7 +261,7 @@ public class BreakoutView extends View {
             end_flag = true;
             for (Brick brick : bricks) {
                 if (!brick.getIsBroken()) {
-                    end_flag = false;
+                    if(brick.getColor()!=Color.WHITE) end_flag = false;
                     switch (dir) {
                         case "UR":
                             if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
@@ -407,7 +443,7 @@ public class BreakoutView extends View {
 
             paintText.setTextSize(100);
             if(flagWin)
-                canvas.drawText("You Win", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
+                canvas.drawText("You Win", ScreenTools.getScreenWidth(context)/2-300, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
             if(flagLoose)
                 canvas.drawText("Game Over", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
         }
@@ -480,12 +516,38 @@ public class BreakoutView extends View {
 
 
         Random random = new Random();
-        // Créer plusieurs lignes de briques
-        for (int row = 0; row < nbRow; row++) {
-            for (int col = 0; col < nbCol; col++) {
-                bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR-1)]));
+        Level level = levels.levels.get(current_game.getP().getLevel()-1);
+        for(int row = 0; row < level.nb_ligne; row++){
+            for(int col = 0; col<levels.NB_COLUMNS;col++){
+                if(level.lines.get(row)[col]=='R')
+                {
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)]));
+                }
+                else if(level.lines.get(row)[col]=='W')
+                {
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.WHITE));
+                }
+                else if(level.lines.get(row)[col]=='G')
+                {
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.GRAY));
+                }
+                else
+                {
+                    Brick brick = new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)]);
+                    brick.setIsBroken(true);
+                    bricks.add(brick);
+                }
             }
         }
+
+        // Créer plusieurs lignes de briques
+       /* for (int row = 0; row < nbRow; row++) {
+            for (int col = 0; col < nbCol; col++) {
+                bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)]));
+            }
+        }*/
+
+
         paint = new Paint();
         paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
