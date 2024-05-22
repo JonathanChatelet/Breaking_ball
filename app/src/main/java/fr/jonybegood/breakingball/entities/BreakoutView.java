@@ -31,6 +31,9 @@ import fr.jonybegood.breakingball.tools.BooleanWrapper;
 import fr.jonybegood.breakingball.tools.GestureTools;
 
 public class BreakoutView extends View {
+    private List<Ball> balls;
+    private List<Ball> bonuss;
+    private Ball bonus;
     private Ball ball;
     private Paddle paddle;
     private List<Brick> bricks;
@@ -40,6 +43,9 @@ public class BreakoutView extends View {
 
     private static final int BALL_RADIUS = 10;
     private static final int BALL_SPEED = -6;
+
+    private static final int BONUS_RADIUS = 30;
+    private static final int BONUS_SPEED = -3;
     private static final int PADDLE_SPEED = 20;
     private static final int PADDLE_HEIGHT = 20;
     private static final int PADDLE_WIDTH = 100;
@@ -49,13 +55,11 @@ public class BreakoutView extends View {
     private static int BRICK_START_X = 5;
     private static final int BRICK_START_Y = 20;
 
-    private static final int NB_ROW = 8;
+    private int nb_row, paddle_width;
 
     private static final int BOTTOM_LIMIT = 400;
 
     private static int bottomLimit;
-
-    private int ballSpeed;
 
     private Levels levels;
 
@@ -79,8 +83,6 @@ public class BreakoutView extends View {
 
     private int scoreMultiplier;
 
-    private int ballRebound;
-
     private int blinkingText;
 
     private GestureDetector gestureDetector;
@@ -92,9 +94,12 @@ public class BreakoutView extends View {
         this.tvScore =tvScore;
         this.tvHighscore=tvHighscore;
         this.runningThread=runningThread;
+        balls = new ArrayList<>();
+        bonuss = new ArrayList<>();
         current_game = game;
         levels = new Levels();
         db = new DbHelper(context);
+        paddle_width = PADDLE_WIDTH;
 
         GestureTools gestureTools = new GestureTools(){
             @Override
@@ -126,25 +131,20 @@ public class BreakoutView extends View {
                         if(start_flag==false) start_flag=true;
                         else {
                             if((ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/4)||(ball.getX() > paddle.getX()+ paddle.getWidth()*3/4 && ball.getX() < paddle.getX() + paddle.getWidth()))
-                                ball.setDy(ballSpeed/2);
+                                ball.setDy(ball.getSpeed()/2);
                             else
-                                ball.setDy(ballSpeed);
-                            //ball.setDy(ballSpeed);
-                            ballRebound++;
+                                ball.setDy(ball.getSpeed());
+                            //ball.setDy(ball.getSpeed());
+                            ball.setRebound(ball.getRebound()+1);
                         }
                         if(ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/4)
-                            ball.setDx(ballSpeed*2);
+                            ball.setDx(ball.getSpeed()*2);
                         else if(ball.getX() > paddle.getX()+ paddle.getWidth()*3/4 && ball.getX() < paddle.getX() + paddle.getWidth())
-                            ball.setDx(-ballSpeed*2);
+                            ball.setDx(-ball.getSpeed()*2);
                         else if((ball.getX()> paddle.getX() + paddle.getWidth()/4)&&(ball.getX()< paddle.getX() + paddle.getWidth()/2))
-                            ball.setDx(ballSpeed);
+                            ball.setDx(ball.getSpeed());
                         else
-                            ball.setDx(-ballSpeed);
-
-                        /*if(ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/2)
-                            ball.setDx(ballSpeed);
-                        else
-                            ball.setDx(-ballSpeed);*/
+                            ball.setDx(-ball.getSpeed());
 
                         try {
                             Thread.sleep(100);
@@ -181,28 +181,28 @@ public class BreakoutView extends View {
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
             }
 
-            if (ballRebound > 20) {
-                ballRebound = 0;
+            if (ball.getRebound() > 20) {
+                ball.setRebound(0);
                 if (ball.getDy()<0){
-                    if(ball.getDy()>ballSpeed)  ball.setDy(ball.getDy()-1);
+                    if(ball.getDy()>ball.getSpeed())  ball.setDy(ball.getDy()-1);
                     else ball.setDy(ball.getDy()-2);
                 }
                 else{
-                    if(ball.getDy()<ballSpeed)  ball.setDy(ball.getDy()+1);
+                    if(ball.getDy()<ball.getSpeed())  ball.setDy(ball.getDy()+1);
                     else ball.setDy(ball.getDy()+2);
                 }
 
                 if (ball.getDx()<0){
-                    if(ball.getDx()<ballSpeed)  ball.setDx(ball.getDx()-4);
+                    if(ball.getDx()<ball.getSpeed())  ball.setDx(ball.getDx()-4);
                     else ball.setDx(ball.getDx()-2);
                 }
                 else{
-                    if(ball.getDx()>ballSpeed)  ball.setDx(ball.getDx()-4);
+                    if(ball.getDx()>ball.getSpeed())  ball.setDx(ball.getDx()-4);
                     else ball.setDx(ball.getDx()-2);
                 }
 
-                if (ballSpeed > 0) ballSpeed += 2;
-                else ballSpeed -= 2;
+                if (ball.getSpeed() > 0) ball.setSpeed(ball.getSpeed() + 2);
+                else ball.setSpeed(ball.getSpeed() - 2);
 
             }
             canvas.drawColor(Color.BLACK);
@@ -272,20 +272,7 @@ public class BreakoutView extends View {
                                 //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
                                 else
                                     ball.setDx(-ball.getDx());
-                                brick.setIsBroken(true);
-                                if (current_game.getSound_effect()) {
-                                    if (mediaPlayerBrick.isPlaying()) {
-                                        mediaPlayerBrick.pause();
-                                        mediaPlayerBrick.seekTo(0);
-                                        mediaPlayerBrick.start();
-                                    } else {
-                                        mediaPlayerBrick.start();
-                                    }
-                                }
-                                ballRebound++;
-                                current_game.setScore(current_game.getScore() + scoreMultiplier);
-                                if (scoreMultiplier <= 50)
-                                    scoreMultiplier++;
+                                updateBrick(brick);
                             }
                             break;
                         case "UL":
@@ -297,20 +284,7 @@ public class BreakoutView extends View {
                                 //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
                                 else
                                     ball.setDx(-ball.getDx());
-                                brick.setIsBroken(true);
-                                if (current_game.getSound_effect()) {
-                                    if (mediaPlayerBrick.isPlaying()) {
-                                        mediaPlayerBrick.pause();
-                                        mediaPlayerBrick.seekTo(0);
-                                        mediaPlayerBrick.start();
-                                    } else {
-                                        mediaPlayerBrick.start();
-                                    }
-                                }
-                                ballRebound++;
-                                current_game.setScore(current_game.getScore() + scoreMultiplier);
-                                if (scoreMultiplier <= 50)
-                                    scoreMultiplier++;
+                                updateBrick(brick);
                             }
                             break;
                         case "DR":
@@ -322,20 +296,7 @@ public class BreakoutView extends View {
                                 //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
                                 else
                                     ball.setDx(-ball.getDx());
-                                brick.setIsBroken(true);
-                                if (current_game.getSound_effect()) {
-                                    if (mediaPlayerBrick.isPlaying()) {
-                                        mediaPlayerBrick.pause();
-                                        mediaPlayerBrick.seekTo(0);
-                                        mediaPlayerBrick.start();
-                                    } else {
-                                        mediaPlayerBrick.start();
-                                    }
-                                }
-                                ballRebound++;
-                                current_game.setScore(current_game.getScore() + scoreMultiplier);
-                                if (scoreMultiplier <= 50)
-                                    scoreMultiplier++;
+                                updateBrick(brick);
                             }
                             break;
                         case "DL":
@@ -347,20 +308,7 @@ public class BreakoutView extends View {
                                 //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
                                 else
                                     ball.setDx(-ball.getDx());
-                                brick.setIsBroken(true);
-                                if (current_game.getSound_effect()) {
-                                    if (mediaPlayerBrick.isPlaying()) {
-                                        mediaPlayerBrick.pause();
-                                        mediaPlayerBrick.seekTo(0);
-                                        mediaPlayerBrick.start();
-                                    } else {
-                                        mediaPlayerBrick.start();
-                                    }
-                                }
-                                ballRebound++;
-                                current_game.setScore(current_game.getScore() + scoreMultiplier);
-                                if (scoreMultiplier <= 50)
-                                    scoreMultiplier++;
+                                updateBrick(brick);
                             }
                             break;
                     }
@@ -392,12 +340,12 @@ public class BreakoutView extends View {
                 }
 
                 scoreMultiplier = 1;
-                ballRebound = 0;
-                ballSpeed = BALL_SPEED;
+                ball.setRebound(0);
+                ball.setSpeed(BALL_SPEED);
                 start_flag = false;
                 ball.setX(ScreenTools.getScreenWidth(context) / 2);
                 ball.setY(bottomLimit - BALL_RADIUS - 100);
-                ball.setDy(ballSpeed);
+                ball.setDy(ball.getSpeed());
             }
         }
         else{
@@ -489,34 +437,59 @@ public class BreakoutView extends View {
         path.lineTo(middleX+100, middleY-150);
     }
 
+    private void updateBrick(Brick brick){
+        brick.setIsBroken(true);
+        if (current_game.getSound_effect()) {
+            if (mediaPlayerBrick.isPlaying()) {
+                mediaPlayerBrick.pause();
+                mediaPlayerBrick.seekTo(0);
+                mediaPlayerBrick.start();
+            } else {
+                mediaPlayerBrick.start();
+            }
+        }
+        ball.setRebound(ball.getRebound()+1);
+        current_game.setScore(current_game.getScore() + scoreMultiplier);
+        if (scoreMultiplier <= 100)
+            scoreMultiplier++;
+
+        if(brick.getBonus()!=Brick.NO_BONUS){
+            bonus = new Ball(brick.getX()+brick.getWidth()/2, brick.getY()+BONUS_RADIUS,0,BONUS_SPEED,BONUS_RADIUS);
+            bonuss.add(bonus);
+        }
+
+
+    }
+
     private void initialiseScreenGame(){
         runningThread = new BooleanWrapper(true);
-        ballSpeed = BALL_SPEED;
         flagLoose = false;
         flagWin = false;
         bottomLimit = ScreenTools.getScreenHeight(context) - BOTTOM_LIMIT;
 
         // Initialisation de la raquette
-        paddle = new Paddle((ScreenTools.getScreenWidth(context)-PADDLE_WIDTH)/2, bottomLimit-100, PADDLE_WIDTH, PADDLE_HEIGHT);
+        paddle = new Paddle((ScreenTools.getScreenWidth(context)-paddle_width)/2, bottomLimit-100, paddle_width, PADDLE_HEIGHT);
 
         // Initialisation de la balle
-        ball = new Ball(paddle.getX()+(PADDLE_WIDTH/2), paddle.getY()-BALL_RADIUS-1, -ballSpeed, ballSpeed, BALL_RADIUS);
+        ball = new Ball(paddle.getX()+(paddle_width/2), paddle.getY()-BALL_RADIUS-1, -BALL_SPEED, BALL_SPEED, BALL_RADIUS);
+        ball.setSpeed(BALL_SPEED);
+        balls.add(ball);
 
         // Initialisation des briques
         bricks = new ArrayList<>();
         int brickWidth = BRICK_WIDTH;
         int brickHeight = BRICK_HEIGHT;
         int startY = BRICK_START_Y;
-        int nbRow = NB_ROW;
         int nbCol = (ScreenTools.getScreenWidth(context)-BRICK_START_X*2)/(brickWidth+1);
         int startX = (ScreenTools.getScreenWidth(context)-(nbCol*(brickWidth+1)))/2;
         scoreMultiplier=1;
-        ballRebound=0;
+        ball.setRebound(0);
         blinkingText=0;
 
 
         Random random = new Random();
         Level level = levels.levels.get(current_game.getP().getLevel()-1);
+        nb_row = level.nb_ligne;
         for(int row = 0; row < level.nb_ligne; row++){
             for(int col = 0; col<levels.NB_COLUMNS;col++){
                 if(level.lines.get(row)[col]=='R')
@@ -529,7 +502,7 @@ public class BreakoutView extends View {
                 }
                 else if(level.lines.get(row)[col]=='G')
                 {
-                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.GRAY));
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.LTGRAY));
                 }
                 else
                 {
@@ -590,8 +563,8 @@ public class BreakoutView extends View {
                 if (paddleY>bottomLimit-PADDLE_HEIGHT)
                     paddleY=bottomLimit-PADDLE_HEIGHT;
 
-                if(paddleY<NB_ROW*(BRICK_HEIGHT+1)+BRICK_START_Y)
-                    paddleY=NB_ROW*(BRICK_HEIGHT+1)+BRICK_START_Y;
+                if(paddleY<nb_row*(BRICK_HEIGHT+1)+BRICK_START_Y)
+                    paddleY=nb_row*(BRICK_HEIGHT+1)+BRICK_START_Y;
 
                 if(paddleX>ScreenTools.getScreenWidth(context)-paddle.getWidth())
                     paddleX=ScreenTools.getScreenWidth(context)-paddle.getWidth();

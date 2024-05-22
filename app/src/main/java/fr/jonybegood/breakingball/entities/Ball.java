@@ -5,6 +5,10 @@ public class Ball {
     private float dx, dy; // Vitesse de la balle
     private float radius; // Rayon de la balle
 
+    private int speed, rebound;
+
+    private char name;
+
     public void setX(float x) {
         this.x = x;
     }
@@ -20,14 +24,19 @@ public class Ball {
     public void setDy(float dy) {
         this.dy = dy;
     }
+    public void setName(char name) {
+        this.name = name;
+    }
 
     public void setRadius(float radius) {
         this.radius = radius;
     }
+    public void setSpeed(int speed) { this.speed=speed; }
+    public void setRebound(int rebound) { this.rebound=rebound; }
 
-    public float getX() {
-        return x;
-    }
+    public int getSpeed() { return speed; }
+    public int getRebound() { return rebound; }
+    public float getX() { return x; }
 
     public float getY() {
         return y;
@@ -44,6 +53,9 @@ public class Ball {
     public float getRadius() {
         return radius;
     }
+    public char getName() {
+        return name;
+    }
 
     public Ball(float x, float y, float dx, float dy, float radius) {
         this.x = x;
@@ -51,6 +63,9 @@ public class Ball {
         this.dx = dx;
         this.dy = dy;
         this.radius = radius;
+        this.name=' ';
+        this.speed = 0;
+        this.rebound = 0;
     }
 }
 

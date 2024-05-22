@@ -3,8 +3,21 @@ package fr.jonybegood.breakingball.entities;
 import android.graphics.Color;
 
 public class Brick {
+
+    public static int BONUS_LIFE = 9;//'+'
+    public static int BONUS_FIRE_PADDLE = 8;//'P'
+    public static int BONUS_FIRE_BALL = 7;//'B'
+    public static int BONUS_SPEED = 6;//'Q'
+    public static int BONUS_SLOW = 5;//'S'
+    public static int BONUS_MULT = 4;//'M'
+    public static int BONUS_SMALLER = 3;//'L'
+    public static int BONUS_LARGER = 2;//'H'
+    public static int BONUS_GLUE = 1;//'G'
+    public static int NO_BONUS = 0;//' '
     private float x, y; // Position de la brique
     private float width, height; // Taille de la brique
+
+    private int bonus;
     private boolean isBroken; // Indique si la brique est cassée
 
     private int color;
@@ -57,6 +70,14 @@ public class Brick {
         return color;
     }
 
+    public void setBonus(int bonus) {
+        this.bonus = bonus;
+    }
+
+    public int getBonus() {
+        return bonus;
+    }
+
     public void setIsBroken(boolean isBroken) {
 
         if(this.getColor()!=Color.WHITE) {
@@ -76,6 +97,7 @@ public class Brick {
         this.height = height;
         this.isBroken = false; // Par défaut, la brique n'est pas cassée
         this.color = color;
+        this.bonus = NO_BONUS;
     }
 }
 
