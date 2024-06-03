@@ -25,6 +25,15 @@ public class GestureTools extends GestureDetector.SimpleOnGestureListener {
     public void onSwipeUp() {
         // Gérer l'action de swipe down ici
     }
+
+
+    public void onSecondFingerTouch(MotionEvent event) {
+        // Gérer le toucher d'un deuxième doigt ici
+    }
+
+    public void onSecondFingerLift(MotionEvent event) {
+        // Gérer le lever du deuxième doigt ici
+    }
 }
 
 

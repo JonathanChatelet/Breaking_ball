@@ -32,19 +32,17 @@ import fr.jonybegood.breakingball.tools.GestureTools;
 
 public class BreakoutView extends View {
     private List<Ball> balls;
-    private List<Ball> bonuss;
-    private Ball bonus;
-    private Ball ball;
+    private List<Bonus> bonuss;
     private Paddle paddle;
     private List<Brick> bricks;
     private Paint paint, paintText;
 
-    private boolean start_flag=false;
+    private boolean start_flag=false,fire_paddle=false,fire_ball=false,glue=false,ball_stop=false;
 
     private static final int BALL_RADIUS = 10;
     private static final int BALL_SPEED = -6;
 
-    private static final int BONUS_RADIUS = 30;
+    private static final int BONUS_RADIUS = 20;
     private static final int BONUS_SPEED = -3;
     private static final int PADDLE_SPEED = 20;
     private static final int PADDLE_HEIGHT = 20;
@@ -125,31 +123,85 @@ public class BreakoutView extends View {
             @Override
             public void run() {
                 while(finalRunningThread.value){
-                    // Gestion des collisions avec la raquette
-                    if ((ball.getY()+BALL_RADIUS) > paddle.getY() && (ball.getY()+BALL_RADIUS) < paddle.getY() + paddle.getHeight() &&
-                            ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()) {
-                        if(start_flag==false) start_flag=true;
-                        else {
-                            if((ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/4)||(ball.getX() > paddle.getX()+ paddle.getWidth()*3/4 && ball.getX() < paddle.getX() + paddle.getWidth()))
-                                ball.setDy(ball.getSpeed()/2);
+                    for (Ball ball: balls) {
+                        // Gestion des collisions avec la raquette
+                        if ((ball.getY() + BALL_RADIUS) > paddle.getY() && (ball.getY() + BALL_RADIUS) < paddle.getY() + paddle.getHeight() &&
+                                ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()) {
+                            if (start_flag == false) start_flag = true;
+                            else {
+                                if ((ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth() / 4) || (ball.getX() > paddle.getX() + paddle.getWidth() * 3 / 4 && ball.getX() < paddle.getX() + paddle.getWidth()))
+                                    ball.setDy(ball.getSpeed() / 2);
+                                else
+                                    ball.setDy(ball.getSpeed());
+                                //ball.setDy(ball.getSpeed());
+                                ball.setRebound(ball.getRebound() + 1);
+                            }
+                            if (ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth() / 4)
+                                ball.setDx(ball.getSpeed() * 2);
+                            else if (ball.getX() > paddle.getX() + paddle.getWidth() * 3 / 4 && ball.getX() < paddle.getX() + paddle.getWidth())
+                                ball.setDx(-ball.getSpeed() * 2);
+                            else if ((ball.getX() > paddle.getX() + paddle.getWidth() / 4) && (ball.getX() < paddle.getX() + paddle.getWidth() / 2))
+                                ball.setDx(ball.getSpeed());
                             else
-                                ball.setDy(ball.getSpeed());
-                            //ball.setDy(ball.getSpeed());
-                            ball.setRebound(ball.getRebound()+1);
-                        }
-                        if(ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()/4)
-                            ball.setDx(ball.getSpeed()*2);
-                        else if(ball.getX() > paddle.getX()+ paddle.getWidth()*3/4 && ball.getX() < paddle.getX() + paddle.getWidth())
-                            ball.setDx(-ball.getSpeed()*2);
-                        else if((ball.getX()> paddle.getX() + paddle.getWidth()/4)&&(ball.getX()< paddle.getX() + paddle.getWidth()/2))
-                            ball.setDx(ball.getSpeed());
-                        else
-                            ball.setDx(-ball.getSpeed());
+                                ball.setDx(-ball.getSpeed());
 
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            Toast.makeText(context, "Thread problem", Toast.LENGTH_SHORT).show();
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                Toast.makeText(context, "Thread problem", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    for (Bonus bonus: bonuss) {
+                        // Gestion des collisions avec la raquette
+                        if ((bonus.getY() + BONUS_RADIUS) > paddle.getY() && (bonus.getY() + BONUS_RADIUS) < paddle.getY() + paddle.getHeight() &&
+                                bonus.getX() > paddle.getX() && bonus.getX() < paddle.getX() + paddle.getWidth()) {
+                            switch (bonus.getValue())
+                            {
+                                case Brick.BONUS_LIFE :
+                                    game.setLife(game.getLife()+1);
+                                    break;
+                                case Brick.BONUS_FIRE_PADDLE :
+                                    fire_paddle = true;
+                                    break;
+                                case Brick.BONUS_FIRE_BALL :
+                                    fire_ball = true;
+                                    break;
+                                case Brick.BONUS_SPEED :
+                                    for (Ball ball:balls)
+                                    {
+                                        ball.setSpeed(ball.getSpeed()*2);
+                                    }
+                                    break;
+                                case Brick.BONUS_SLOW :
+                                    for (Ball ball:balls)
+                                    {
+                                        ball.setSpeed(ball.getSpeed()/2);
+                                    }
+                                    break;
+                                case Brick.BONUS_MULT :
+                                    List <Ball> balls_add = new ArrayList<>();
+                                    for (Ball ball:balls)
+                                    {
+                                        Ball ball1 = new Ball(ball.getX(),ball.getY(),ball.getDx(),ball.getDy()+2,BALL_RADIUS);
+                                        Ball ball2 = new Ball(ball.getX(),ball.getY(),ball.getDx(),ball.getDy()-2,BALL_RADIUS);
+                                        balls_add.add(ball1);
+                                        balls_add.add(ball2);
+                                    }
+                                    balls.addAll(balls_add);
+                                    break;
+                                case Brick.BONUS_SMALLER :
+                                    paddle.setWidth(paddle.getWidth()/2);
+                                    break;
+                                case Brick.BONUS_LARGER :
+                                    paddle.setWidth(paddle.getWidth()*2);
+                                    break;
+                                case Brick.BONUS_GLUE :
+                                    glue = true;
+                                    break;
+                            }
+
                         }
                     }
                 }
@@ -169,9 +221,8 @@ public class BreakoutView extends View {
         super.onDraw(canvas);
         boolean end_flag;
 
-        if (!(flagWin||flagLoose)) {
-
-
+        if (!(flagWin||flagLoose))
+        {
             if (!tvScore.getText().equals(String.valueOf(current_game.getScore())))
                 tvScore.setText(String.valueOf(current_game.getScore()));
             if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife())))
@@ -181,30 +232,6 @@ public class BreakoutView extends View {
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
             }
 
-            if (ball.getRebound() > 20) {
-                ball.setRebound(0);
-                if (ball.getDy()<0){
-                    if(ball.getDy()>ball.getSpeed())  ball.setDy(ball.getDy()-1);
-                    else ball.setDy(ball.getDy()-2);
-                }
-                else{
-                    if(ball.getDy()<ball.getSpeed())  ball.setDy(ball.getDy()+1);
-                    else ball.setDy(ball.getDy()+2);
-                }
-
-                if (ball.getDx()<0){
-                    if(ball.getDx()<ball.getSpeed())  ball.setDx(ball.getDx()-4);
-                    else ball.setDx(ball.getDx()-2);
-                }
-                else{
-                    if(ball.getDx()>ball.getSpeed())  ball.setDx(ball.getDx()-4);
-                    else ball.setDx(ball.getDx()-2);
-                }
-
-                if (ball.getSpeed() > 0) ball.setSpeed(ball.getSpeed() + 2);
-                else ball.setSpeed(ball.getSpeed() - 2);
-
-            }
             canvas.drawColor(Color.BLACK);
 
             paint.setColor(Color.BLACK);
@@ -220,7 +247,11 @@ public class BreakoutView extends View {
 
             // Dessiner la balle
             paint.setColor(Color.WHITE);
-            canvas.drawCircle(ball.getX(), ball.getY(), ball.getRadius(), paint);
+            for (Ball ball : balls)
+            {
+                canvas.drawCircle(ball.getX(), ball.getY(), ball.getRadius(), paint);
+            }
+
 
             // Dessiner la raquette
             paint.setColor(Color.LTGRAY);
@@ -234,118 +265,150 @@ public class BreakoutView extends View {
                 }
             }
 
-            // Déplacer la balle
-            if (start_flag == true) {
-                ball.setX(ball.getX() + ball.getDx());
-                ball.setY(ball.getY() + ball.getDy());
+            //Dessiner et deplacer les bonus
+            for(Bonus bonus : bonuss){
+                switch (bonus.getValue())
+                {
+                    case Brick.BONUS_LIFE : paint.setColor(Color.WHITE); break;
+                    case Brick.BONUS_FIRE_PADDLE : paint.setColor(Color.YELLOW); break;
+                    case Brick.BONUS_FIRE_BALL : paint.setColor(Color.RED); break;
+                    case Brick.BONUS_SPEED : paint.setColor(Color.BLUE); break;
+                    case Brick.BONUS_SLOW : paint.setColor(Color.DKGRAY); break;
+                    case Brick.BONUS_MULT : paint.setColor(Color.LTGRAY); break;
+                    case Brick.BONUS_SMALLER : paint.setColor(Color.GRAY); break;
+                    case Brick.BONUS_LARGER : paint.setColor(Color.GREEN); break;
+                    case Brick.BONUS_GLUE : paint.setColor(Color.CYAN); break;
+                    default: paint.setColor(Color.BLACK);
+                }
+                canvas.drawCircle(bonus.getX(), bonus.getY(), bonus.getRadius(), paint);
+
+                bonus.setY(bonus.getY() + bonus.getDy());
             }
 
-
-            // Gestion des collisions avec les bords de l'écran
-            if (ball.getX() < 0 || ball.getX() > canvas.getWidth()) {
-                ball.setDx(-ball.getDx());
-            }
-            if (ball.getY() < 0) {
-                ball.setDy(-ball.getDy());
-            }
-
-            // Gestion des collisions avec les briques
-            String dir = "";
-            if (ball.getDy() > 0) dir += "D";
-            else dir += "U";
-
-            if (ball.getDx() > 0) dir += "R";
-            else dir += "L";
+            for (Ball ball : balls) {
+                // Déplacer la balle
+                if (start_flag == true) {
+                    ball.setX(ball.getX() + ball.getDx());
+                    ball.setY(ball.getY() + ball.getDy());
+                }
 
 
-            end_flag = true;
-            for (Brick brick : bricks) {
-                if (!brick.getIsBroken()) {
-                    if(brick.getColor()!=Color.WHITE) end_flag = false;
-                    switch (dir) {
-                        case "UR":
-                            if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                    ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
-                                if(ball.getX()-brick.getX()>brick.getY()+brick.getHeight()-ball.getY())
-                                    ball.setDy(-ball.getDy());
-                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
-                                else
-                                    ball.setDx(-ball.getDx());
-                                updateBrick(brick);
-                            }
-                            break;
-                        case "UL":
-                            if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                    ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
-                                if(brick.getX()+brick.getWidth()-ball.getX()>brick.getY()+brick.getHeight()-ball.getY())
-                                    ball.setDy(-ball.getDy());
-                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
-                                else
-                                    ball.setDx(-ball.getDx());
-                                updateBrick(brick);
-                            }
-                            break;
-                        case "DR":
-                            if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                    ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
-                                if(ball.getX()-brick.getX()> ball.getY()-brick.getY())
-                                    ball.setDy(-ball.getDy());
-                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
-                                else
-                                    ball.setDx(-ball.getDx());
-                                updateBrick(brick);
-                            }
-                            break;
-                        case "DL":
-                            if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                    ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
-                                //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
-                                if(brick.getX()+brick.getWidth()-ball.getX()>ball.getY()-brick.getY())
-                                    ball.setDy(-ball.getDy());
-                                //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
-                                else
-                                    ball.setDx(-ball.getDx());
-                                updateBrick(brick);
-                            }
-                            break;
+                // Gestion des collisions avec les bords de l'écran
+                if (ball.getX() < 0 || ball.getX() > canvas.getWidth()) {
+                    ball.setDx(-ball.getDx());
+                }
+                if (ball.getY() < 0) {
+                    ball.setDy(-ball.getDy());
+                }
+
+                // Gestion des collisions avec les briques
+                String dir = "";
+                if (ball.getDy() > 0) dir += "D";
+                else dir += "U";
+
+                if (ball.getDx() > 0) dir += "R";
+                else dir += "L";
+
+
+                end_flag = true;
+                for (Brick brick : bricks) {
+                    if (!brick.getIsBroken()) {
+                        if (brick.getColor() != Color.WHITE) end_flag = false;
+                        switch (dir) {
+                            case "UR":
+                                if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                        ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                    if (ball.getX() - brick.getX() > brick.getY() + brick.getHeight() - ball.getY())
+                                        ball.setDy(-ball.getDy());
+                                        //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                    else
+                                        ball.setDx(-ball.getDx());
+                                    updateBrick(brick, ball);
+                                }
+                                break;
+                            case "UL":
+                                if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                        ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                    if (brick.getX() + brick.getWidth() - ball.getX() > brick.getY() + brick.getHeight() - ball.getY())
+                                        ball.setDy(-ball.getDy());
+                                        //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                    else
+                                        ball.setDx(-ball.getDx());
+                                    updateBrick(brick, ball);
+                                }
+                                break;
+                            case "DR":
+                                if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                        ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                    if (ball.getX() - brick.getX() > ball.getY() - brick.getY())
+                                        ball.setDy(-ball.getDy());
+                                        //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                    else
+                                        ball.setDx(-ball.getDx());
+                                    updateBrick(brick, ball);
+                                }
+                                break;
+                            case "DL":
+                                if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                        ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
+                                    if (brick.getX() + brick.getWidth() - ball.getX() > ball.getY() - brick.getY())
+                                        ball.setDy(-ball.getDy());
+                                        //if ((ball.getX() - ball.getDx() < brick.getX()) || (ball.getX() - ball.getDx() > brick.getX() + brick.getWidth()))
+                                    else
+                                        ball.setDx(-ball.getDx());
+                                    updateBrick(brick, ball);
+                                }
+                                break;
+                        }
                     }
-
                 }
-            }
-            if (end_flag) {
-                flagWin = true;
-                flagEndGame = true;
-            }
 
-            if (flagWin) {
-                if (current_game.getSound_effect())
-                    mediaPlayerWin.start();
-            }
 
-            //gestion de la défaite
-            if (ball.getY() > bottomLimit) {
-                current_game.setLife(current_game.getLife() - 1);
-                if (current_game.getSound_effect()) {
-                    if (current_game.getLife() == 0)
-                        mediaPlayerGameOver.start();
-                    else
-                        mediaPlayerLose.start();
-                }
-                if (current_game.getLife() == 0){
-                    flagLoose = true;
+                if (end_flag) {
+                    flagWin = true;
                     flagEndGame = true;
                 }
 
-                scoreMultiplier = 1;
-                ball.setRebound(0);
-                ball.setSpeed(BALL_SPEED);
-                start_flag = false;
-                ball.setX(ScreenTools.getScreenWidth(context) / 2);
-                ball.setY(bottomLimit - BALL_RADIUS - 100);
-                ball.setDy(ball.getSpeed());
+                if (flagWin) {
+                    if (current_game.getSound_effect())
+                        mediaPlayerWin.start();
+                }
+
+                //gestion de la défaite
+
+                balls.removeIf(bal -> bal.getY()>bottomLimit);
+                if (balls.size()==0)
+                {
+                    current_game.setLife(current_game.getLife() - 1);
+                    if (current_game.getSound_effect()) {
+                        if (current_game.getLife() == 0)
+                            mediaPlayerGameOver.start();
+                        else
+                            mediaPlayerLose.start();
+                    }
+                    if (current_game.getLife() == 0) {
+                        flagLoose = true;
+                        flagEndGame = true;
+                    }
+
+                    scoreMultiplier = 1;
+                    start_flag = false;
+                    fire_paddle = false;
+                    fire_ball = false;
+                    glue=false;
+                    ball_stop=false;
+                    paddle.setWidth(PADDLE_WIDTH);
+                    Ball bal = new Ball(ScreenTools.getScreenWidth(context) / 2,bottomLimit - BALL_RADIUS - 100,0,0,BALL_RADIUS);
+                    bal.setRebound(0);
+                    bal.setSpeed(BALL_SPEED);
+                    bal.setDy(ball.getSpeed());
+                    bal.setDx(ball.getSpeed());
+                    balls.add(bal);
+                }
             }
         }
         else{
@@ -437,8 +500,13 @@ public class BreakoutView extends View {
         path.lineTo(middleX+100, middleY-150);
     }
 
-    private void updateBrick(Brick brick){
+    private void updateBrick(Brick brick,Ball ball){
         brick.setIsBroken(true);
+        if(brick.getBonus()!=Brick.NO_BONUS)
+        {
+            Bonus bonus = new Bonus(brick.getX()+brick.getWidth()/2-BONUS_RADIUS,brick.getY()-BONUS_RADIUS,0,BONUS_SPEED,BONUS_RADIUS);
+            bonuss.add(bonus);
+        }
         if (current_game.getSound_effect()) {
             if (mediaPlayerBrick.isPlaying()) {
                 mediaPlayerBrick.pause();
@@ -448,16 +516,32 @@ public class BreakoutView extends View {
                 mediaPlayerBrick.start();
             }
         }
-        ball.setRebound(ball.getRebound()+1);
+        ball.setRebound(ball.getRebound() + 1);
+
+        if (ball.getRebound() > 20) {
+            ball.setRebound(0);
+            if (ball.getDy() < 0) {
+                if (ball.getDy() > ball.getSpeed()) ball.setDy(ball.getDy() - 1);
+                else ball.setDy(ball.getDy() - 2);
+            } else {
+                if (ball.getDy() < ball.getSpeed()) ball.setDy(ball.getDy() + 1);
+                else ball.setDy(ball.getDy() + 2);
+            }
+
+            if (ball.getDx() < 0) {
+                if (ball.getDx() < ball.getSpeed()) ball.setDx(ball.getDx() - 4);
+                else ball.setDx(ball.getDx() - 2);
+            } else {
+                if (ball.getDx() > ball.getSpeed()) ball.setDx(ball.getDx() - 4);
+                else ball.setDx(ball.getDx() - 2);
+            }
+
+            if (ball.getSpeed() > 0) ball.setSpeed(ball.getSpeed() + 2);
+            else ball.setSpeed(ball.getSpeed() - 2);
+        }
         current_game.setScore(current_game.getScore() + scoreMultiplier);
         if (scoreMultiplier <= 100)
             scoreMultiplier++;
-
-        if(brick.getBonus()!=Brick.NO_BONUS){
-            bonus = new Ball(brick.getX()+brick.getWidth()/2, brick.getY()+BONUS_RADIUS,0,BONUS_SPEED,BONUS_RADIUS);
-            bonuss.add(bonus);
-        }
-
 
     }
 
@@ -465,14 +549,21 @@ public class BreakoutView extends View {
         runningThread = new BooleanWrapper(true);
         flagLoose = false;
         flagWin = false;
+        fire_paddle = false;
+        fire_ball = false;
+        glue=false;
+        ball_stop=false;
         bottomLimit = ScreenTools.getScreenHeight(context) - BOTTOM_LIMIT;
 
         // Initialisation de la raquette
         paddle = new Paddle((ScreenTools.getScreenWidth(context)-paddle_width)/2, bottomLimit-100, paddle_width, PADDLE_HEIGHT);
+        paddle.setWidth(PADDLE_WIDTH);
 
         // Initialisation de la balle
-        ball = new Ball(paddle.getX()+(paddle_width/2), paddle.getY()-BALL_RADIUS-1, -BALL_SPEED, BALL_SPEED, BALL_RADIUS);
+        if(balls.size()!=0) balls.clear();
+        Ball ball = new Ball(paddle.getX()+(paddle_width/2), paddle.getY()-BALL_RADIUS-1, -BALL_SPEED, BALL_SPEED, BALL_RADIUS);
         ball.setSpeed(BALL_SPEED);
+        ball.setRebound(0);
         balls.add(ball);
 
         // Initialisation des briques
@@ -483,30 +574,36 @@ public class BreakoutView extends View {
         int nbCol = (ScreenTools.getScreenWidth(context)-BRICK_START_X*2)/(brickWidth+1);
         int startX = (ScreenTools.getScreenWidth(context)-(nbCol*(brickWidth+1)))/2;
         scoreMultiplier=1;
-        ball.setRebound(0);
         blinkingText=0;
 
 
         Random random = new Random();
         Level level = levels.levels.get(current_game.getP().getLevel()-1);
         nb_row = level.nb_ligne;
+        int bonus;
+        if(random.nextInt(Brick.NB_BONUS)==5)
+        {
+            bonus = random.nextInt(Brick.NB_BONUS);
+        }
+        else
+            bonus = 0;
         for(int row = 0; row < level.nb_ligne; row++){
             for(int col = 0; col<levels.NB_COLUMNS;col++){
                 if(level.lines.get(row)[col]=='R')
                 {
-                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)]));
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)],bonus));
                 }
                 else if(level.lines.get(row)[col]=='W')
                 {
-                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.WHITE));
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.WHITE,Brick.NO_BONUS));
                 }
                 else if(level.lines.get(row)[col]=='G')
                 {
-                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.LTGRAY));
+                    bricks.add(new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,Color.LTGRAY,Brick.NO_BONUS));
                 }
                 else
                 {
-                    Brick brick = new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)]);
+                    Brick brick = new Brick(startX + col * (brickWidth + 1), startY + row * (brickHeight + 1), brickWidth, brickHeight,COLOR[random.nextInt(NB_COLOR)],Brick.NO_BONUS);
                     brick.setIsBroken(true);
                     bricks.add(brick);
                 }

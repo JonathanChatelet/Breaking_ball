@@ -7,8 +7,6 @@ public class Ball {
 
     private int speed, rebound;
 
-    private char name;
-
     public void setX(float x) {
         this.x = x;
     }
@@ -23,9 +21,6 @@ public class Ball {
 
     public void setDy(float dy) {
         this.dy = dy;
-    }
-    public void setName(char name) {
-        this.name = name;
     }
 
     public void setRadius(float radius) {
@@ -53,9 +48,6 @@ public class Ball {
     public float getRadius() {
         return radius;
     }
-    public char getName() {
-        return name;
-    }
 
     public Ball(float x, float y, float dx, float dy, float radius) {
         this.x = x;
@@ -63,7 +55,6 @@ public class Ball {
         this.dx = dx;
         this.dy = dy;
         this.radius = radius;
-        this.name=' ';
         this.speed = 0;
         this.rebound = 0;
     }
