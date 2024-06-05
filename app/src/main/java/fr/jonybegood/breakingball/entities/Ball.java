@@ -7,8 +7,14 @@ public class Ball {
 
     private int speed, rebound;
 
+    private boolean ball_stop;
+
     public void setX(float x) {
         this.x = x;
+    }
+
+    public void setBall_stop(boolean ball_stop) {
+        this.ball_stop = ball_stop;
     }
 
     public void setY(float y) {
@@ -26,10 +32,18 @@ public class Ball {
     public void setRadius(float radius) {
         this.radius = radius;
     }
-    public void setSpeed(int speed) { this.speed=speed; }
+    public void setSpeed(int speed) {
+        if(speed > 0)
+            speed *=-1;
+        if(speed<-25)
+            this.speed=25;
+        else
+            this.speed=speed;
+    }
     public void setRebound(int rebound) { this.rebound=rebound; }
 
     public int getSpeed() { return speed; }
+    public boolean getBall_stop() { return ball_stop; }
     public int getRebound() { return rebound; }
     public float getX() { return x; }
 
@@ -57,6 +71,7 @@ public class Ball {
         this.radius = radius;
         this.speed = 0;
         this.rebound = 0;
+        this.ball_stop=false;
     }
 }
 

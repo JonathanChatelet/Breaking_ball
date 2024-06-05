@@ -29,8 +29,6 @@ public class GameActivity extends AppCompatActivity {
     private Game game;
     private MediaPlayer mediaPlayer;
 
-    private BooleanWrapper runningThread;
-
     private TextView tvGameInfo,tvScore,tvHighscore,tvPseudo;
 
     private DbHelper db;
@@ -55,11 +53,10 @@ public class GameActivity extends AppCompatActivity {
         tvPseudo.setText(game.getP().getPseudo()+" highscore :");
         tvGameInfo.setText("Level "+String.valueOf(game.getP().getLevel()));
         db = new DbHelper(this);
-        runningThread = new BooleanWrapper(true);
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentLayout, new GameFragment(game,tvGameInfo,tvScore,tvHighscore,runningThread))
+                .add(R.id.fragmentLayout, new GameFragment(game,tvGameInfo,tvScore,tvHighscore))
                 .commit();
         mediaPlayer = MediaPlayer.create(this, R.raw.music);
         if(game.getMusic()){
@@ -88,7 +85,6 @@ public class GameActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         mediaPlayer.stop();
-        runningThread.value = false;
     }
     @Override
     protected void onRestart() {
@@ -100,7 +96,6 @@ public class GameActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mediaPlayer.stop();
-        runningThread.value = false;
     }
 
 }

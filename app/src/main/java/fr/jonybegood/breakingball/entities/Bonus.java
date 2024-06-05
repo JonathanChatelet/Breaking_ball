@@ -6,7 +6,7 @@ public class Bonus
         private float dx, dy; // Vitesse de la balle
         private float radius; // Rayon de la balle
 
-        private int speed, value;
+        private int value;
 
         public void setX(float x) {
             this.x = x;
@@ -27,10 +27,8 @@ public class Bonus
         public void setRadius(float radius) {
             this.radius = radius;
         }
-        public void setSpeed(int speed) { this.speed=speed; }
         public void setValue(int value) { this.value=value; }
 
-        public int getSpeed() { return speed; }
         public int getValue() { return value; }
         public float getX() { return x; }
 
@@ -50,13 +48,12 @@ public class Bonus
             return radius;
         }
 
-        public Bonus(float x, float y, float dx, float dy, float radius) {
+        public Bonus(float x, float y, float dx, float dy, float radius, int value) {
             this.x = x;
             this.y = y;
             this.dx = dx;
             this.dy = dy;
             this.radius = radius;
-            this.speed = 0;
-            this.value = 0;
+            this.value = value;
         }
 }
