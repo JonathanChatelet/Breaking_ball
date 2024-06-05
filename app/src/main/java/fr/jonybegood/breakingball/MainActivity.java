@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnStartGame(View view) {
-        Intent intent = new Intent(this, GameActivity.class);
+        Intent intent = new Intent(this, BrekingBallRulesActivity.class);
         Bundle b = new Bundle();
         b.putSerializable("game", (Serializable) game);
         intent.putExtras(b);

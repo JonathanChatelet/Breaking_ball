@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/snowfall"
+    tools:context=".BrekingBallRulesActivity">
+
+    <Button
+        android:id="@+id/btn_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play"
+        android:onClick="btnPlayGame"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.96" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="179dp"
+        android:layout_height="51dp"
+        android:text="Bonus "
+        android:textAlignment="center"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.704" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FFFFFFFF"
+        android:paddingStart="5sp"
+        android:text="Win a life"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FF444444"
+        android:paddingStart="5sp"
+        android:text="Decrease ball speed "
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView11"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FF0000FF"
+        android:paddingStart="5sp"
+        android:text="Increase ball speed"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView12"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FF888888"
+        android:paddingStart="5sp"
+        android:text="Smaller paddle"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView13"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FF00FF00"
+        android:paddingStart="5sp"
+        android:text="Larger paddle"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.879" />
+
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FFFFFF00"
+        android:paddingStart="5sp"
+        android:text="Fire paddle"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView17"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView15"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FFFF0000"
+        android:paddingStart="5sp"
+        android:text="Fire Ball"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FFCCCCCC"
+        android:paddingStart="5sp"
+        android:text="Triple ball"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.54" />
+
+    <TextView
+        android:id="@+id/textView17"
+        android:layout_width="250dp"
+        android:layout_height="30dp"
+        android:drawableLeft="@drawable/baseline_circle_24"
+        android:drawableTint="#FF00FFFF"
+        android:paddingStart="5sp"
+        android:text="Glue"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView18"
+        android:layout_width="180dp"
+        android:layout_height="26dp"
+        android:text="Select Your Level :"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btn_play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView16"
+        app:layout_constraintVertical_bias="0.202" />
+
+    <Spinner
+        android:id="@+id/sp_level"
+        android:layout_width="342dp"
+        android:layout_height="25dp"
+        android:paddingStart="5sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView18"
+        app:layout_constraintVertical_bias="0.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

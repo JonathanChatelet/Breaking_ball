@@ -6,6 +6,8 @@ public class Game implements Serializable {
     private int life;
     private long score;
 
+    private int current_level;
+
     private Profil p;
 
     private boolean sound_effect;
@@ -13,6 +15,10 @@ public class Game implements Serializable {
 
     public void setLife(int life) {
         this.life = life;
+    }
+
+    public void setCurrent_level(int current_level) {
+        this.current_level = current_level;
     }
 
     public void setScore(long score) {
@@ -33,6 +39,10 @@ public class Game implements Serializable {
 
     public int getLife() {
         return life;
+    }
+
+    public int getCurrent_level() {
+        return current_level;
     }
 
     public long getScore() {
@@ -57,8 +67,7 @@ public class Game implements Serializable {
         this.p = p;
         this.sound_effect = sound_effect;
         this.music=music;
-
-
+        current_level = p.getLevel();
     }
 
     public Game() {

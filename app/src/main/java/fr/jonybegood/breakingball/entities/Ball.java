@@ -5,6 +5,8 @@ public class Ball {
     private float dx, dy; // Vitesse de la balle
     private float radius; // Rayon de la balle
 
+    private float offset = 0;
+
     private int speed, rebound;
 
     private boolean ball_stop;
@@ -27,6 +29,9 @@ public class Ball {
 
     public void setDy(float dy) {
         this.dy = dy;
+    }
+    public void setOffset(float offset) {
+        this.offset = offset;
     }
 
     public void setRadius(float radius) {
@@ -54,6 +59,9 @@ public class Ball {
     public float getDx() {
         return dx;
     }
+    public float getOffset() {
+        return offset;
+    }
 
     public float getDy() {
         return dy;
@@ -71,6 +79,7 @@ public class Ball {
         this.radius = radius;
         this.speed = 0;
         this.rebound = 0;
+        this.offset=0;
         this.ball_stop=false;
     }
 }

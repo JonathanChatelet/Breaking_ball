@@ -77,11 +77,12 @@ public class BreakoutView extends View {
 
     private DbHelper db;
 
-    private BooleanWrapper runningThread;
+    private BooleanWrapper runningThread = new BooleanWrapper(true);
+    private Thread checCollisionThread;
 
-    private MediaPlayer mediaPlayerBrick, mediaPlayerWin, mediaPlayerLose, mediaPlayerGameOver;
+    private MediaPlayer mediaPlayerBrick,mediaPlayerBoing,mediaPlayerStone, mediaPlayerWin, mediaPlayerLose, mediaPlayerGameOver;
 
-    private boolean flagWin,flagLoose,flagEndGame;
+    private boolean flagWin,flagLoose,flagEndGame,notDoubleRebound=true;
     private Game current_game;
 
     private TextView tvGameInfo, tvScore,tvHighscore;
@@ -94,7 +95,7 @@ public class BreakoutView extends View {
 
     private int tap_count;
 
-    public BreakoutView(Context context,Game game, TextView tvGameInfo, TextView tvScore, TextView tvHighscore) {
+    public BreakoutView(Context context,Game game, TextView tvGameInfo, TextView tvScore, TextView tvHighscore,BooleanWrapper runningThread) {
         super(context);
         this.context=context;
         this.tvGameInfo = tvGameInfo;
@@ -119,6 +120,68 @@ public class BreakoutView extends View {
             }
         };
 
+        checCollisionThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(get_runningThread())
+                {
+                    try{
+                        for(Ball ball : balls) {
+                            // Gestion des collisions avec la raquette
+                            if ((ball.getY() + BALL_RADIUS) > paddle.getY() && (ball.getY() + BALL_RADIUS) < paddle.getY() + paddle.getHeight() &&
+                                    ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth()) {
+                                if (start_flag == false) start_flag = true;
+                                else {
+                                    if ((ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth() / 4) || (ball.getX() > paddle.getX() + paddle.getWidth() * 3 / 4 && ball.getX() < paddle.getX() + paddle.getWidth())) {
+                                        ball.setDy(ball.getSpeed() / 2);
+                                    } else
+                                        ball.setDy(ball.getSpeed());
+                                    //ball.setDy(ball.getSpeed());
+                                }
+                                if (ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth() / 4)
+                                    ball.setDx(ball.getSpeed());
+                                else if (ball.getX() > paddle.getX() + paddle.getWidth() * 3 / 4 && ball.getX() < paddle.getX() + paddle.getWidth())
+                                    ball.setDx(-ball.getSpeed());
+                                else if ((ball.getX() > paddle.getX() + paddle.getWidth() / 4) && (ball.getX() < paddle.getX() + paddle.getWidth() / 2))
+                                    ball.setDx(ball.getSpeed());
+                                else
+                                    ball.setDx(-ball.getSpeed());
+                                if (glue) {
+                                    if(!ball.getBall_stop())
+                                    {
+                                        ball.setOffset(ball.getX()-paddle.getX());
+                                        if (mediaPlayerBoing.isPlaying()) {
+                                            mediaPlayerBoing.pause();
+                                            mediaPlayerBoing.seekTo(0);
+                                            mediaPlayerBoing.start();
+                                        } else
+                                            mediaPlayerBoing.start();
+                                    }
+                                    ball.setBall_stop(true);
+                                }
+                                else{
+                                    if (mediaPlayerBoing.isPlaying()) {
+                                        mediaPlayerBoing.pause();
+                                        mediaPlayerBoing.seekTo(0);
+                                        mediaPlayerBoing.start();
+                                    } else
+                                        mediaPlayerBoing.start();
+                                }
+                                if(notDoubleRebound){
+                                    notDoubleRebound = false;
+                                    ball.setRebound(ball.getRebound() + 1);
+                                }
+
+
+                            }
+                        }
+                    }
+                    catch(Exception e){}
+                }
+            }
+        });
+        checCollisionThread.start();
+
         gestureDetector = new GestureDetector(context, gestureTools);
 
         this.setOnTouchListener(new View.OnTouchListener() {
@@ -134,6 +197,8 @@ public class BreakoutView extends View {
         mediaPlayerWin = MediaPlayer.create(this.getContext(), R.raw.success);
         mediaPlayerLose= MediaPlayer.create(this.getContext(), R.raw.lose);
         mediaPlayerGameOver= MediaPlayer.create(this.getContext(), R.raw.game_over);
+        mediaPlayerBoing = MediaPlayer.create(this.getContext(), R.raw.boing);
+        mediaPlayerStone = MediaPlayer.create(this.getContext(), R.raw.stone);
     }
 
     @Override
@@ -145,8 +210,8 @@ public class BreakoutView extends View {
         {
             if (!tvScore.getText().equals(String.valueOf(current_game.getScore())))
                 tvScore.setText(String.valueOf(current_game.getScore()));
-            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife())))
-                tvGameInfo.setText("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife()));
+            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getCurrent_level()) + " - Life : " + String.valueOf(current_game.getLife())))
+                tvGameInfo.setText("Level " + String.valueOf(current_game.getCurrent_level()) + " - Life : " + String.valueOf(current_game.getLife()));
             if (current_game.getScore() > current_game.getP().getHighScore()) {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
@@ -324,35 +389,6 @@ public class BreakoutView extends View {
                     }
                 }
 
-                // Gestion des collisions avec la raquette
-                if ((ball.getY() + BALL_RADIUS) > paddle.getY() && (ball.getY() + BALL_RADIUS) < paddle.getY() + paddle.getHeight() &&
-                        ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth())
-                {
-                    if (start_flag == false) start_flag = true;
-                    else
-                    {
-                        if ((ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth() / 4) || (ball.getX() > paddle.getX() + paddle.getWidth() * 3 / 4 && ball.getX() < paddle.getX() + paddle.getWidth()))
-                        {
-                            if(Math.abs(ball.getDy())>=Math.abs(ball.getSpeed())) ball.setDy(ball.getSpeed() / 2);
-                        }
-                        else
-                            ball.setDy(ball.getSpeed());
-                        //ball.setDy(ball.getSpeed());
-                    }
-                    if (ball.getX() > paddle.getX() && ball.getX() < paddle.getX() + paddle.getWidth() / 4)
-                        ball.setDx(ball.getSpeed());
-                    else if (ball.getX() > paddle.getX() + paddle.getWidth() * 3 / 4 && ball.getX() < paddle.getX() + paddle.getWidth())
-                        ball.setDx(-ball.getSpeed());
-                    else if ((ball.getX() > paddle.getX() + paddle.getWidth() / 4) && (ball.getX() < paddle.getX() + paddle.getWidth() / 2))
-                        ball.setDx(ball.getSpeed());
-                    else
-                        ball.setDx(-ball.getSpeed());
-                    if(glue) ball.setBall_stop(true);
-                    ball.setRebound(ball.getRebound() + 1);
-                }
-
-
-
                 if (end_flag) {
                     flagWin = true;
                     flagEndGame = true;
@@ -476,8 +512,8 @@ public class BreakoutView extends View {
         else{
             if (!tvScore.getText().equals(String.valueOf(current_game.getScore())))
                 tvScore.setText(String.valueOf(current_game.getScore()));
-            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife())))
-                tvGameInfo.setText("Level " + String.valueOf(current_game.getP().getLevel()) + " - Life : " + String.valueOf(current_game.getLife()));
+            if (!tvGameInfo.getText().equals("Level " + String.valueOf(current_game.getCurrent_level()) + " - Life : " + String.valueOf(current_game.getLife())))
+                tvGameInfo.setText("Level " + String.valueOf(current_game.getCurrent_level()) + " - Life : " + String.valueOf(current_game.getLife()));
             if (current_game.getScore() > current_game.getP().getHighScore()) {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
@@ -526,24 +562,29 @@ public class BreakoutView extends View {
         if(flagEndGame)
         {
             if(flagWin){
-                runningThread.value=false;
                 nextLevel();
             }
             else if(flagLoose){
                 restartGame();
-                runningThread.value=false;
             }
         }
 
     }
 
     private void nextLevel() {
-        current_game.getP().setLevel(current_game.getP().getLevel()+1);
-        db.modifyProfil(current_game.getP());
+        current_game.setCurrent_level(current_game.getCurrent_level()+1);
+        if(current_game.getCurrent_level()>current_game.getP().getLevel()) {
+            current_game.getP().setLevel(current_game.getCurrent_level());
+            db.modifyProfil(current_game.getP());
+        }
         fireJet.clear();
         bonuss.clear();
         balls.clear();
         flagEndGame = false;
+    }
+
+    private boolean get_runningThread(){
+        return runningThread.value;
     }
 
     private void restartGame() {
@@ -569,6 +610,7 @@ public class BreakoutView extends View {
     }
 
     private void updateBrick(Brick brick,Ball ball){
+        notDoubleRebound=true;
         brick.setIsBroken(true);
         if(brick.getBonus()!=Brick.NO_BONUS)
         {
@@ -576,13 +618,35 @@ public class BreakoutView extends View {
             bonuss.add(bonus);
         }
         if (current_game.getSound_effect()) {
-            if (mediaPlayerBrick.isPlaying()) {
-                mediaPlayerBrick.pause();
-                mediaPlayerBrick.seekTo(0);
-                mediaPlayerBrick.start();
-            } else {
-                mediaPlayerBrick.start();
+            if(brick.getColor()==Color.DKGRAY||brick.getColor()==Color.GRAY||brick.getColor()==Color.LTGRAY) {
+                if (mediaPlayerStone.isPlaying()) {
+                    mediaPlayerStone.pause();
+                    mediaPlayerStone.seekTo(0);
+                    mediaPlayerStone.start();
+                } else {
+                    mediaPlayerStone.start();
+                }
             }
+            else if (brick.getColor()==Color.WHITE)
+            {
+                if (mediaPlayerBoing.isPlaying()) {
+                    mediaPlayerBoing.pause();
+                    mediaPlayerBoing.seekTo(0);
+                    mediaPlayerBoing.start();
+                } else {
+                    mediaPlayerBoing.start();
+                }
+            } else
+            {
+                if (mediaPlayerBrick.isPlaying()) {
+                    mediaPlayerBrick.pause();
+                    mediaPlayerBrick.seekTo(0);
+                    mediaPlayerBrick.start();
+                } else {
+                    mediaPlayerBrick.start();
+                }
+            }
+
         }
         ball.setRebound(ball.getRebound() + 1);
 
@@ -617,11 +681,20 @@ public class BreakoutView extends View {
             Bonus bonus = new Bonus(brick.getX()-BONUS_RADIUS,brick.getY()-BONUS_RADIUS,0,BONUS_SPEED,BONUS_RADIUS,brick.getBonus());
             bonuss.add(bonus);
         }
+        if (current_game.getSound_effect()) {
+            if (mediaPlayerBrick.isPlaying()) {
+                mediaPlayerBrick.pause();
+                mediaPlayerBrick.seekTo(0);
+                mediaPlayerBrick.start();
+            } else {
+                mediaPlayerBrick.start();
+            }
+        }
     }
 
 
     private void initialiseScreenGame(){
-        runningThread = new BooleanWrapper(true);
+
         flagLoose = false;
         flagWin = false;
         fire_paddle = false;
@@ -652,7 +725,7 @@ public class BreakoutView extends View {
 
 
         Random random = new Random();
-        Level level = levels.levels.get(current_game.getP().getLevel()-1);
+        Level level = levels.levels.get(current_game.getCurrent_level()-1);
         nb_row = level.nb_ligne;
         int bonus;
 
@@ -741,7 +814,7 @@ public class BreakoutView extends View {
                 for(Ball ball : balls){
                     if(ball.getBall_stop())
                     {
-                        ball.setX(paddle.getX()+paddle.getWidth()/2);
+                        ball.setX(paddle.getX()+ball.getOffset());
                         ball.setY(paddle.getY()-BALL_RADIUS);
                     }
                 }

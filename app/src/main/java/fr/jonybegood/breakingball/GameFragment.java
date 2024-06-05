@@ -30,19 +30,20 @@ public class GameFragment extends Fragment {
     private String mParam2;
 
     private Game game;
-
+    private BooleanWrapper runningThread;
     private TextView tvGameInfo,tvScore,tvHighscore;
 
     public GameFragment() {
         // Required empty public constructor
     }
 
-    public GameFragment(Game game, TextView tvGameInfo, TextView tvScore,TextView tvHighscore) {
+    public GameFragment(Game game, TextView tvGameInfo, TextView tvScore,TextView tvHighscore,BooleanWrapper runningThread) {
         // Required empty public constructor
         this.game=game;
         this.tvGameInfo = tvGameInfo;
         this.tvScore = tvScore;
         this.tvHighscore=tvHighscore;
+        this.runningThread = runningThread;
     }
 
     /**
@@ -76,7 +77,7 @@ public class GameFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        BreakoutView breakoutView = new BreakoutView(getContext(),game,tvGameInfo,tvScore,tvHighscore);
+        BreakoutView breakoutView = new BreakoutView(getContext(),game,tvGameInfo,tvScore,tvHighscore,runningThread);
         // Inflate the layout for this fragment
         return breakoutView;
     }
