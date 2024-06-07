@@ -171,8 +171,6 @@ public class BreakoutView extends View {
                                     notDoubleRebound = false;
                                     ball.setRebound(ball.getRebound() + 1);
                                 }
-
-
                             }
                         }
                     }
@@ -331,8 +329,8 @@ public class BreakoutView extends View {
                             switch (dir)
                             {
                                 case "UR":
-                                    if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                            ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                            ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
                                         //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
                                         if (ball.getX() - brick.getX() > brick.getY() + brick.getHeight() - ball.getY())
                                             ball.setDy(-ball.getDy());
@@ -343,8 +341,8 @@ public class BreakoutView extends View {
                                     }
                                     break;
                                 case "UL":
-                                    if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                            ball.getY() - BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                            ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
                                         //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
                                         if (brick.getX() + brick.getWidth() - ball.getX() > brick.getY() + brick.getHeight() - ball.getY())
                                             ball.setDy(-ball.getDy());
@@ -355,8 +353,8 @@ public class BreakoutView extends View {
                                     }
                                     break;
                                 case "DR":
-                                    if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                            ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                            ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
                                         //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
                                         if (ball.getX() - brick.getX() > ball.getY() - brick.getY())
                                             ball.setDy(-ball.getDy());
@@ -367,8 +365,8 @@ public class BreakoutView extends View {
                                     }
                                     break;
                                 case "DL":
-                                    if (ball.getX() - BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                            ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() + BALL_RADIUS < brick.getY() + brick.getHeight()) {
+                                    if (ball.getX() + BALL_RADIUS > brick.getX() && ball.getX() - BALL_RADIUS < brick.getX() + brick.getWidth() &&
+                                            ball.getY() + BALL_RADIUS > brick.getY() && ball.getY() - BALL_RADIUS < brick.getY() + brick.getHeight()) {
                                         //if ((ball.getY() - ball.getDy() > brick.getY() + brick.getHeight()) || (ball.getY() - ball.getDy() < brick.getY()))
                                         if (brick.getX() + brick.getWidth() - ball.getX() > ball.getY() - brick.getY())
                                             ball.setDy(-ball.getDy());
@@ -408,7 +406,7 @@ public class BreakoutView extends View {
             List<Bonus> copy_bonus = new ArrayList<>();
             for(Bonus bonus : bonuss)
             {
-                // Gestion des collisions avec la raquette
+                // Gestion des collisions des bonus avec la raquette
                 if ((bonus.getY() + BONUS_RADIUS) > paddle.getY() && (bonus.getY() + BONUS_RADIUS) < paddle.getY() + paddle.getHeight() &&
                         bonus.getX() > paddle.getX() && bonus.getX() < paddle.getX() + paddle.getWidth()) {
                     switch (bonus.getValue())
@@ -497,8 +495,8 @@ public class BreakoutView extends View {
             {
                 for (Brick brick : bricks) {
                     if (!brick.getIsBroken()) {
-                        if (fire.getX() + BALL_RADIUS > brick.getX() && fire.getX() + BALL_RADIUS < brick.getX() + brick.getWidth() &&
-                                fire.getY() - BALL_RADIUS > brick.getY() && fire.getY() - BALL_RADIUS < brick.getY() + brick.getHeight())
+                        if (fire.getX() + FIRE_RADIUS > brick.getX() && fire.getX() - FIRE_RADIUS < brick.getX() + brick.getWidth() &&
+                                fire.getY() + FIRE_RADIUS > brick.getY() && fire.getY() - FIRE_RADIUS < brick.getY() + brick.getHeight())
                         {
                                 updateBrickFire(brick, fire);
                                 copy_fire.add(fire);
@@ -715,11 +713,15 @@ public class BreakoutView extends View {
 
         // Initialisation des briques
         bricks = new ArrayList<>();
-        int brickWidth = BRICK_WIDTH;
-        int brickHeight = BRICK_HEIGHT;
+        int brickWidth;
+        int brickHeight=BRICK_HEIGHT;
         int startY = BRICK_START_Y;
         int nbCol = NB_COLUMNS;
-        int startX = (ScreenTools.getScreenWidth(context)-(nbCol*(brickWidth)))/2;
+        int startX = BRICK_START_X;
+
+        brickWidth = (ScreenTools.getScreenWidth(context)-2*startX)/20;
+        startX = (ScreenTools.getScreenWidth(context)-brickWidth*20)/2;
+        
         scoreMultiplier=1;
         blinkingText=0;
 
@@ -731,7 +733,7 @@ public class BreakoutView extends View {
 
         for(int row = 0; row < level.nb_ligne; row++){
             for(int col = 0; col<levels.NB_COLUMNS;col++){
-                if(random.nextInt(20)==10)
+                if(random.nextInt(10)==5)
                     bonus = random.nextInt(Brick.NB_BONUS+1);
                 else
                     bonus = 0;
@@ -801,8 +803,8 @@ public class BreakoutView extends View {
                 if (paddleY>bottomLimit-PADDLE_HEIGHT)
                     paddleY=bottomLimit-PADDLE_HEIGHT;
 
-                if(paddleY<nb_row*(BRICK_HEIGHT+1)+BRICK_START_Y)
-                    paddleY=nb_row*(BRICK_HEIGHT+1)+BRICK_START_Y;
+                if(paddleY<(nb_row+1)*(BRICK_HEIGHT+1)+BRICK_START_Y)
+                    paddleY=(nb_row+1)*(BRICK_HEIGHT+1)+BRICK_START_Y;
 
                 if(paddleX>ScreenTools.getScreenWidth(context)-paddle.getWidth())
                     paddleX=ScreenTools.getScreenWidth(context)-paddle.getWidth();
