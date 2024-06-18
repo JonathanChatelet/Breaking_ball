@@ -218,6 +218,7 @@ public class NewProfilActivity extends AppCompatActivity {
                 game.getP().setLevel(1);
                 url = game.getP().getPseudo()+".png";
                 game.getP().setPhoto(url);
+                game.getP().setTetrixHighScore(0);
 
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 selectImageLauncher.launch(intent);

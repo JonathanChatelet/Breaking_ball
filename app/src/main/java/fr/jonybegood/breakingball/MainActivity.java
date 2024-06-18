@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         Bundle b = new Bundle();
                         b = data.getExtras();
                         game = (Game) b.getSerializable("game");
-                        tvPlayerInfo.setText(game.getP().getPseudo() + " / level : " + game.getP().getLevel() + " / highscore : " + game.getP().getHighScore());
+                        tvPlayerInfo.setText(game.getP().getPseudo() + " / level : " + game.getP().getLevel() + " / Breaking ball highscore : " + game.getP().getHighScore()+ " \n Tetrix highscore : " + game.getP().getTetrixHighScore());
                         if (game.getP().getPhoto() != "") {
                             File fichierImage = new File(MainActivity.this.getFilesDir(), game.getP().getPhoto());
                             if (fichierImage.exists())
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                         Bundle b = new Bundle();
                         b = data.getExtras();
                         game = (Game) b.getSerializable("game");
-                        tvPlayerInfo.setText(game.getP().getPseudo() + " / level : " + game.getP().getLevel() + " / highscore : " + game.getP().getHighScore());
+                        tvPlayerInfo.setText(game.getP().getPseudo() + " / level : " + game.getP().getLevel() + " / Breaking ball highscore : " + game.getP().getHighScore()+ " \n Tetrix highscore : " + game.getP().getTetrixHighScore());
 
                     }
                 }

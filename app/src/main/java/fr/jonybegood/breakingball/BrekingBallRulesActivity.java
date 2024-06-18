@@ -48,6 +48,7 @@ public class BrekingBallRulesActivity extends AppCompatActivity {
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, levels);
         spLevel.setAdapter(adapter);
+        spLevel.setSelection(game.getP().getLevel()-1);
 
         spLevel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

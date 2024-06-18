@@ -29,12 +29,18 @@
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/breaking_ball_ico"
+        android:icon="@mipmap/breaking_ball_2"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/breaking_ball_ico_round"
+        android:roundIcon="@mipmap/breaking_ball_2_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BreakingBall"
         tools:targetApi="31">
+        <activity
+            android:name=".GameFragment2"
+            android:exported="false" />
+        <activity
+            android:name=".GameActivity2"
+            android:exported="false" />
         <activity
             android:name=".BrekingBallRulesActivity"
             android:exported="false" />

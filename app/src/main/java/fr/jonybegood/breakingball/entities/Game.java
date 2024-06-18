@@ -6,6 +6,8 @@ public class Game implements Serializable {
     private int life;
     private long score;
 
+    private long tetrix_score;
+
     private int current_level;
 
     private Profil p;
@@ -24,6 +26,10 @@ public class Game implements Serializable {
     public void setScore(long score) {
         this.score = score;
     }
+    public void setTetrixScore(long tetrix_score) {
+        this.tetrix_score = tetrix_score;
+    }
+
 
     public void setP(Profil p) {
         this.p = p;
@@ -49,6 +55,10 @@ public class Game implements Serializable {
         return score;
     }
 
+    public long getTetrixScoreScore() {
+        return tetrix_score;
+    }
+
     public Profil getP() {
         return p;
     }
@@ -68,14 +78,16 @@ public class Game implements Serializable {
         this.sound_effect = sound_effect;
         this.music=music;
         current_level = p.getLevel();
+        this.tetrix_score=0;
     }
 
     public Game() {
 
-        this.p = new Profil("", "", 0, 1, "");
+        this.p = new Profil("", "", 0, 1, "",0);
         this.music=true;
         this.sound_effect=true;
         this.life=5;
+        this.tetrix_score=0;
         this.score=0;
     }
 }

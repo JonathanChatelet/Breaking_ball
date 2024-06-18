@@ -115,7 +115,7 @@ public class BreakoutView extends View {
         GestureTools gestureTools = new GestureTools(){
             @Override
             public void onSwipeUp(){
-                if(flagWin||flagLoose)
+                if((flagWin&&!flagLoose)||(flagLoose&&!flagWin))
                     initialiseScreenGame();
             }
         };
@@ -429,7 +429,8 @@ public class BreakoutView extends View {
                         case Brick.BONUS_SLOW :
                             for (Ball ball:balls)
                             {
-                                ball.setSpeed(ball.getSpeed()/2);
+                                if(Math.abs(ball.getSpeed())>=4)
+                                    ball.setSpeed(ball.getSpeed()/2);
                             }
                             break;
                         case Brick.BONUS_MULT :
@@ -516,11 +517,9 @@ public class BreakoutView extends View {
                 current_game.getP().setHighScore(current_game.getScore());
                 tvHighscore.setText(String.valueOf(current_game.getP().getHighScore()));
             }
+
             canvas.drawColor(Color.BLACK);
-            paint.setStrokeWidth(10);
-            paint.setStyle(Paint.Style.STROKE); // Style pour le contour de la flèche
-            Path path = new Path();
-            createArrowPath(path);
+
             blinkingText++;
             if(blinkingText<50) {
                 if(flagLoose){
@@ -531,6 +530,10 @@ public class BreakoutView extends View {
                     paint.setColor(Color.GREEN);
                     paintText.setColor(Color.GREEN);
                 }
+                if(flagWin&&flagLoose){
+                    paint.setColor(Color.WHITE);
+                    paintText.setColor(Color.WHITE);
+                }
             }
             else{
                 paint.setColor(Color.BLUE);
@@ -540,19 +543,31 @@ public class BreakoutView extends View {
             if(blinkingText>100)
                 blinkingText=0;
 
-            canvas.drawPath(path, paint);
+            if((flagWin&&!flagLoose)||(flagLoose&&!flagWin)){
+                paint.setStrokeWidth(10);
+                paint.setStyle(Paint.Style.STROKE); // Style pour le contour de la flèche
+                Path path = new Path();
+                createArrowPath(path);
+                canvas.drawPath(path, paint);
+            }
+
 
             paintText.setTextSize(48);
             if(flagWin)
                 canvas.drawText("Swipe up to change level", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 50, paintText);
             if(flagLoose)
                 canvas.drawText("Swipe up to restart level", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 50, paintText);
+            if(flagWin&&flagLoose)
+                canvas.drawText("  You finish all levels", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 50, paintText);
+
 
             paintText.setTextSize(100);
             if(flagWin)
                 canvas.drawText("You Win", ScreenTools.getScreenWidth(context)/2-200, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
             if(flagLoose)
                 canvas.drawText("Game Over", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 150, paintText);
+            if(flagWin&&flagLoose)
+                canvas.drawText("  Please exit the game.", ScreenTools.getScreenWidth(context)/2-250, ScreenTools.getScreenHeight(context)/2 + 50, paintText);
         }
 
         invalidate();
@@ -570,15 +585,21 @@ public class BreakoutView extends View {
     }
 
     private void nextLevel() {
-        current_game.setCurrent_level(current_game.getCurrent_level()+1);
-        if(current_game.getCurrent_level()>current_game.getP().getLevel()) {
-            current_game.getP().setLevel(current_game.getCurrent_level());
-            db.modifyProfil(current_game.getP());
+        if(current_game.getCurrent_level()<20){
+            current_game.setCurrent_level(current_game.getCurrent_level()+1);
+            if(current_game.getCurrent_level()>current_game.getP().getLevel()) {
+                current_game.getP().setLevel(current_game.getCurrent_level());
+                db.modifyProfil(current_game.getP());
+            }
+            fireJet.clear();
+            bonuss.clear();
+            balls.clear();
+            flagEndGame = false;
         }
-        fireJet.clear();
-        bonuss.clear();
-        balls.clear();
-        flagEndGame = false;
+        else{
+            flagLoose=true;
+        }
+
     }
 
     private boolean get_runningThread(){
@@ -667,9 +688,10 @@ public class BreakoutView extends View {
 
             ball.setSpeed(ball.getSpeed() - 2);
         }
-        current_game.setScore(current_game.getScore() + scoreMultiplier);
-        scoreMultiplier++;
-
+        if(brick.getColor()!=Color.WHITE){
+            current_game.setScore(current_game.getScore() + scoreMultiplier);
+            scoreMultiplier++;
+        }
     }
 
     private void updateBrickFire(Brick brick,Ball fire){
@@ -721,7 +743,7 @@ public class BreakoutView extends View {
 
         brickWidth = (ScreenTools.getScreenWidth(context)-2*startX)/20;
         startX = (ScreenTools.getScreenWidth(context)-brickWidth*20)/2;
-        
+
         scoreMultiplier=1;
         blinkingText=0;
 

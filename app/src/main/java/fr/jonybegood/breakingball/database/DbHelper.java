@@ -32,6 +32,8 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_LEVEL = "Level";
     private static final String COLUMN_PHOTO = "Photo";
 
+    private static final String COLUMN_TETRIX_HIGHSCORE = "TetrixHighscore";
+
 
     public DbHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,7 +43,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.i(">>>Database", "Created...");
         //creation de la table  Note
-        String script = "CREATE TABLE "+TABLE_NAME+"("+COLUMN_PSEUDO+" TEXT PRIMARY KEY,"+COLUMN_PASSWORD+" TEXT,"+COLUMN_HIGHSCORE+" INTEGER,"+COLUMN_LEVEL+" INTEGER,"+COLUMN_PHOTO+" TEXT)";
+        String script = "CREATE TABLE "+TABLE_NAME+"("+COLUMN_PSEUDO+" TEXT PRIMARY KEY,"+COLUMN_PASSWORD+" TEXT,"+COLUMN_HIGHSCORE+" INTEGER,"+COLUMN_LEVEL+" INTEGER,"+COLUMN_PHOTO+" TEXT,"+COLUMN_TETRIX_HIGHSCORE+" INTEGER)";
         db.execSQL(script);
     }
 
@@ -58,6 +60,7 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(COLUMN_HIGHSCORE,profil.getHighScore());
         values.put(COLUMN_LEVEL,profil.getLevel());
         values.put(COLUMN_PHOTO,profil.getPhoto());
+        values.put(COLUMN_TETRIX_HIGHSCORE,profil.getTetrixHighScore());
         db.insert(TABLE_NAME,null,values);
         db.close();
     }
@@ -76,6 +79,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 note.setHighScore(Long.parseLong((cursor.getString(2))));
                 note.setLevel(Integer.parseInt((cursor.getString(3))));
                 note.setPhoto((cursor.getString(4)));
+                note.setTetrixHighScore(Long.parseLong(cursor.getString(5)));
                 notes.add(note);
             }while (cursor.moveToNext());
         }
@@ -88,11 +92,11 @@ public class DbHelper extends SQLiteOpenHelper {
     public Profil getByPseudo(String pseudo){
         Profil profil=null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME,new String[]{COLUMN_PSEUDO,COLUMN_PASSWORD,COLUMN_HIGHSCORE,COLUMN_LEVEL,COLUMN_PHOTO},
+        Cursor cursor = db.query(TABLE_NAME,new String[]{COLUMN_PSEUDO,COLUMN_PASSWORD,COLUMN_HIGHSCORE,COLUMN_LEVEL,COLUMN_PHOTO,COLUMN_TETRIX_HIGHSCORE},
                 COLUMN_PSEUDO+"=?", new String[]{String.valueOf(pseudo)},null,null,null);
         if(cursor!=null){
             cursor.moveToFirst();
-            profil = new Profil(cursor.getString(0), cursor.getString(1), Long.parseLong(cursor.getString(2)), Integer.parseInt(cursor.getString(3)), cursor.getString(4));
+            profil = new Profil(cursor.getString(0), cursor.getString(1), Long.parseLong(cursor.getString(2)), Integer.parseInt(cursor.getString(3)), cursor.getString(4),Long.parseLong(cursor.getString(5)));
         }
         cursor.close();
         db.close();
@@ -108,6 +112,7 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(COLUMN_HIGHSCORE,p.getHighScore());
         values.put(COLUMN_LEVEL,p.getLevel());
         values.put(COLUMN_PHOTO,p.getPhoto());
+        values.put(COLUMN_TETRIX_HIGHSCORE,p.getTetrixHighScore());
         db.update(TABLE_NAME,values,COLUMN_PSEUDO+"=?",new String[]{String.valueOf(p.getPseudo())});
     }
 

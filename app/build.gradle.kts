@@ -1,3 +1,5 @@
+import com.android.sdklib.computeFullReleaseName
+
 plugins {
     alias(libs.plugins.androidApplication)
 }
@@ -26,6 +28,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
 }
 
 dependencies {

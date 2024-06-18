@@ -11,6 +11,8 @@ public class Profil implements Serializable {
 
     private long highScore;
 
+    private long tetrix_highscore;
+
     private int level;
 
     public void setPseudo(String pseudo) {
@@ -24,6 +26,10 @@ public class Profil implements Serializable {
     public void setHighScore(long highScore) {
         this.highScore = highScore;
     }
+    public void setTetrixHighScore(long tetrix_highscore) {
+        this.tetrix_highscore = tetrix_highscore;
+    }
+
 
     public void setLevel(int level) {
         this.level = level;
@@ -45,6 +51,10 @@ public class Profil implements Serializable {
         return highScore;
     }
 
+    public long getTetrixHighScore() {
+        return tetrix_highscore;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -55,12 +65,13 @@ public class Profil implements Serializable {
 
     private String photo;
 
-    public Profil(String pseudo, String password, long highScore, int level,String photo) {
+    public Profil(String pseudo, String password, long highScore, int level,String photo,long tetrix_highscore) {
         this.pseudo = pseudo;
         this.password = password;
         this.highScore = highScore;
         this.level = level;
         this.photo = photo;
+        this.tetrix_highscore=tetrix_highscore;
     }
 
     public Profil() {
